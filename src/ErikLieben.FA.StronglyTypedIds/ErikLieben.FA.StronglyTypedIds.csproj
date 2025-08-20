@@ -23,14 +23,11 @@
     <!-- Symbol package settings -->
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-
-    <!-- The generator dependency defaults to the same version as this package, but can be overridden via /p:GeneratorPackageVersion -->
-    <GeneratorPackageVersion Condition="'$(GeneratorPackageVersion)' == ''">$(PackageVersion)</GeneratorPackageVersion>
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- Pull in the source generator transitively for consumers -->
-    <PackageReference Include="ErikLieben.FA.StronglyTypedId.Generator" Version="$(GeneratorPackageVersion)" IncludeAssets="runtime; build; native; contentfiles; analyzers; buildtransitive" />
+    <!-- Use local project as Analyzer so it is packed inside this package and works without a published generator package -->
+    <ProjectReference Include="..\ErikLieben.FA.StronglyTypedIds.Generator\ErikLieben.FA.StronglyTypedIds.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
   <ItemGroup>
