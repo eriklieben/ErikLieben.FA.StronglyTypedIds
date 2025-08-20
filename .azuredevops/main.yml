@@ -31,7 +31,8 @@ extends:
       buildConfiguration: '$(BuildConfiguration)'
       useSemanticRelease: true
       packageProjects:
-        - displayName: 'library'
-          path: 'src/ErikLieben.FA.StronglyTypedIds/ErikLieben.FA.StronglyTypedIds.csproj'
         - displayName: 'generator'
           path: 'src/ErikLieben.FA.StronglyTypedIds.Generator/ErikLieben.FA.StronglyTypedIds.Generator.csproj'
+        - displayName: 'library'
+          path: 'src/ErikLieben.FA.StronglyTypedIds/ErikLieben.FA.StronglyTypedIds.csproj'
+
