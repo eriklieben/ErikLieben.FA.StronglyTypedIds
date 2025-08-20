@@ -1,3 +1,12 @@
+## [2.0.1](https://github.com/eriklieben/ErikLieben.FA.StronglyTypedIds/compare/v2.0.0...v2.0.1) (2025-08-20)
+
+### 🐛 Bug fixes
+
+* add correct version number during build so that analyzer loads correctly ([7cc1d04](https://github.com/eriklieben/ErikLieben.FA.StronglyTypedIds/commit/7cc1d045e4748d5425471d17d287a7e32b49da7e))
+* adjust Generator reference to use different nuget id ([31b2fc2](https://github.com/eriklieben/ErikLieben.FA.StronglyTypedIds/commit/31b2fc2731d0bf59cc7869c4981f66cf40c338a8))
+* process Generator before regular package ([f31a93b](https://github.com/eriklieben/ErikLieben.FA.StronglyTypedIds/commit/f31a93b16e0d42f1d6822f971d779e0cc5f5aa92))
+* resolve reference to Generator projecT ([8f07b65](https://github.com/eriklieben/ErikLieben.FA.StronglyTypedIds/commit/8f07b65f44ed454b3d75cdc04434fc910dc63603))
+
 ## [2.0.0](https://github.com/eriklieben/ErikLieben.FA.StronglyTypedIds/compare/v1.0.0...v2.0.0) (2025-08-20)
 
 ### ⚠ BREAKING CHANGES
