@@ -14,6 +14,7 @@
     <Company>Erik Lieben</Company>
     <Description>Lightweight strongly typed ID primitives and helpers for .NET.</Description>
     <PackageTags>strongly-typed;ids;value-object;dotnet;csharp</PackageTags>
+    <RepositoryUrl>https://github.com/eriklieben/ErikLieben.FA.StronglyTypedIds</RepositoryUrl>
 
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageReadmeFile>README.md</PackageReadmeFile>
@@ -29,7 +30,7 @@
 
   <ItemGroup>
     <!-- Pull in the source generator transitively for consumers -->
-    <PackageReference Include="ErikLieben.FA.StronglyTypedIds.Generator" Version="$(GeneratorPackageVersion)" IncludeAssets="runtime; build; native; contentfiles; analyzers; buildtransitive" />
+    <PackageReference Include="ErikLieben.FA.StronglyTypedId.Generator" Version="$(GeneratorPackageVersion)" IncludeAssets="runtime; build; native; contentfiles; analyzers; buildtransitive" />
   </ItemGroup>
 
   <ItemGroup>

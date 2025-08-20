@@ -5,13 +5,13 @@
         <Nullable>enable</Nullable>
         <IncludeBuildOutput>false</IncludeBuildOutput>
         <DebugType>portable</DebugType>
-        <PackageId>ErikLieben.FA.StronglyTypedIds.Generator</PackageId>
+        <PackageId>ErikLieben.FA.StronglyTypedId.Generator</PackageId>
         <PackageVersion Condition="'$(PackageVersion)' == '' and '$(Version)' != ''">$(Version)</PackageVersion>
         <Authors>Erik Lieben</Authors>
         <Description>Source generator for strongly typed identities</Description>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageLicenseFile>LICENSE</PackageLicenseFile>
-        <RepositoryUrl>https://github.com/yourname/strongly-typed-ids</RepositoryUrl>
+        <RepositoryUrl>https://github.com/eriklieben/ErikLieben.FA.StronglyTypedIds</RepositoryUrl>
         <PackageTags>source-generator;strongly-typed-ids;csharp;dotnet</PackageTags>
         <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
         <PackageType>Analyzer</PackageType>
