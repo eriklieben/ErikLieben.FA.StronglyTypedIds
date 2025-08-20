@@ -8,7 +8,7 @@
 
     <!-- NuGet package metadata -->
     <PackageId>ErikLieben.FA.StronglyTypedIds</PackageId>
-    <PackageVersion>1.0.0-preview.1</PackageVersion>
+    <PackageVersion Condition="'$(PackageVersion)' == '' and '$(Version)' != ''">$(Version)</PackageVersion>
     <Title>ErikLieben.FA.StronglyTypedIds</Title>
     <Authors>Erik Lieben</Authors>
     <Company>Erik Lieben</Company>
@@ -22,7 +22,15 @@
     <!-- Symbol package settings -->
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+
+    <!-- The generator dependency defaults to the same version as this package, but can be overridden via /p:GeneratorPackageVersion -->
+    <GeneratorPackageVersion Condition="'$(GeneratorPackageVersion)' == ''">$(PackageVersion)</GeneratorPackageVersion>
   </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Pull in the source generator transitively for consumers -->
+    <PackageReference Include="ErikLieben.FA.StronglyTypedIds.Generator" Version="$(GeneratorPackageVersion)" IncludeAssets="runtime; build; native; contentfiles; analyzers; buildtransitive" />
+  </ItemGroup>
 
   <ItemGroup>
     <!-- Include repository root README and LICENSE in the package root -->

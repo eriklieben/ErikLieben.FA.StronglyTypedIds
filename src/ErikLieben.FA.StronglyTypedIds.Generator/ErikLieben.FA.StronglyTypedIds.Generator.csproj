@@ -5,8 +5,8 @@
         <Nullable>enable</Nullable>
         <IncludeBuildOutput>false</IncludeBuildOutput>
         <DebugType>portable</DebugType>
-        <PackageId>ErikLieben.FA.StronglyTypedId.Generator</PackageId>
-        <PackageVersion>1.0.0-preview.1</PackageVersion>
+        <PackageId>ErikLieben.FA.StronglyTypedIds.Generator</PackageId>
+        <PackageVersion Condition="'$(PackageVersion)' == '' and '$(Version)' != ''">$(Version)</PackageVersion>
         <Authors>Erik Lieben</Authors>
         <Description>Source generator for strongly typed identities</Description>
         <PackageReadmeFile>README.md</PackageReadmeFile>
