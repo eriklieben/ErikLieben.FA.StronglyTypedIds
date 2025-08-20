@@ -1,0 +1,25 @@
+{
+  "baseBranches": ["main", "maintenance/net8"],
+  "packageRules": [
+    {
+      "description": "Latest .NET for main branch",
+      "matchBaseBranches": ["main"],
+      "extends": [
+        "github>eriklieben/renovate//dotnet9.json"
+      ]
+    },
+    {
+      "description": ".NET 8 maintenance for maintenance branches",
+      "matchBaseBranches": ["maintenance/net8"],
+      "extends": [
+        "github>eriklieben/renovate//dotnet8.json"
+      ]
+    },
+    {
+      "description": "Only security and patch updates for maintenance branches",
+      "matchBaseBranches": ["maintenance/net8"],
+      "matchUpdateTypes": ["major", "minor"],
+      "enabled": false
+    }
+  ]
+}

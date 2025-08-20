@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <DebugType>portable</DebugType>
+
+    <!-- NuGet package metadata -->
+    <PackageId>ErikLieben.FA.StronglyTypedIds</PackageId>
+    <PackageVersion>1.0.0-preview.1</PackageVersion>
+    <Title>ErikLieben.FA.StronglyTypedIds</Title>
+    <Authors>Erik Lieben</Authors>
+    <Company>Erik Lieben</Company>
+    <Description>Lightweight strongly typed ID primitives and helpers for .NET.</Description>
+    <PackageTags>strongly-typed;ids;value-object;dotnet;csharp</PackageTags>
+
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+
+    <!-- Symbol package settings -->
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Include repository root README and LICENSE in the package root -->
+    <None Include="..\\..\\README.md" Pack="true" PackagePath="" />
+    <None Include="..\\..\\LICENSE" Pack="true" PackagePath="" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,42 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <LangVersion>latest</LangVersion>
+        <Nullable>enable</Nullable>
+        <IncludeBuildOutput>false</IncludeBuildOutput>
+        <DebugType>portable</DebugType>
+        <PackageId>ErikLieben.FA.StronglyTypedId.Generator</PackageId>
+        <PackageVersion>1.0.0-preview.1</PackageVersion>
+        <Authors>Erik Lieben</Authors>
+        <Description>Source generator for strongly typed identities</Description>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageLicenseFile>LICENSE</PackageLicenseFile>
+        <RepositoryUrl>https://github.com/yourname/strongly-typed-ids</RepositoryUrl>
+        <PackageTags>source-generator;strongly-typed-ids;csharp;dotnet</PackageTags>
+        <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+        <PackageType>Analyzer</PackageType>
+        <IsRoslynAnalyzer>true</IsRoslynAnalyzer>
+
+		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+		<IncludeSymbols>false</IncludeSymbols>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.14.0" PrivateAssets="all" />
+        <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="4.14.0" PrivateAssets="all" />
+    </ItemGroup>
+
+    <!-- Package the analyzer -->
+    <ItemGroup>
+        <None Include="..\..\README.md" Pack="true" PackagePath="" />
+        <None Include="..\..\LICENSE" Pack="true" PackagePath="" />
+    </ItemGroup>
+    <!-- Package the generator correctly -->
+    <ItemGroup>
+        <Content Include="$(TargetPath)">
+            <Pack>true</Pack>
+            <PackagePath>analyzers\dotnet\cs</PackagePath>
+        </Content>
+    </ItemGroup>
+
+</Project>

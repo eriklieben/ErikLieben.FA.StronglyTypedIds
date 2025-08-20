@@ -1,0 +1,46 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ErikLieben.FA.StronglyTypedIds", "src\ErikLieben.FA.StronglyTypedIds\ErikLieben.FA.StronglyTypedIds.csproj", "{36405B2C-7EC6-4CF3-A253-C0A071F16D5E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ErikLieben.FA.StronglyTypedIds.Generator", "src\ErikLieben.FA.StronglyTypedIds.Generator\ErikLieben.FA.StronglyTypedIds.Generator.csproj", "{824FDE16-E334-404D-A636-2A4A4B00220C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{B9567541-C38C-41E4-A5B6-F51817C4E384}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ErikLieben.FA.StronglyTypedIds.Tests", "test\ErikLieben.FA.StronglyTypedIds.Tests\ErikLieben.FA.StronglyTypedIds.Tests.csproj", "{FAAC86A5-C21C-4118-B2C8-D3206E86ACA0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ErikLieben.FA.StronglyTypedIds.Generator.Tests", "test\ErikLieben.FA.StronglyTypedIds.Generator.Tests\ErikLieben.FA.StronglyTypedIds.Generator.Tests.csproj", "{DB55F2F0-5D4F-4BFF-8683-AAB19CA2C6E9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".azuredevops", ".azuredevops", "{7B3C5E4A-9D12-4E7F-8C78-4B2C2D8D1F31}"
+	ProjectSection(SolutionItems) = preProject
+		.azuredevops\main.yml = .azuredevops\main.yml
+		.azuredevops\pr.yml = .azuredevops\pr.yml
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{36405B2C-7EC6-4CF3-A253-C0A071F16D5E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{36405B2C-7EC6-4CF3-A253-C0A071F16D5E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{36405B2C-7EC6-4CF3-A253-C0A071F16D5E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{36405B2C-7EC6-4CF3-A253-C0A071F16D5E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{824FDE16-E334-404D-A636-2A4A4B00220C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{824FDE16-E334-404D-A636-2A4A4B00220C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{824FDE16-E334-404D-A636-2A4A4B00220C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{824FDE16-E334-404D-A636-2A4A4B00220C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FAAC86A5-C21C-4118-B2C8-D3206E86ACA0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FAAC86A5-C21C-4118-B2C8-D3206E86ACA0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FAAC86A5-C21C-4118-B2C8-D3206E86ACA0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FAAC86A5-C21C-4118-B2C8-D3206E86ACA0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DB55F2F0-5D4F-4BFF-8683-AAB19CA2C6E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DB55F2F0-5D4F-4BFF-8683-AAB19CA2C6E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DB55F2F0-5D4F-4BFF-8683-AAB19CA2C6E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DB55F2F0-5D4F-4BFF-8683-AAB19CA2C6E9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{FAAC86A5-C21C-4118-B2C8-D3206E86ACA0} = {B9567541-C38C-41E4-A5B6-F51817C4E384}
+		{DB55F2F0-5D4F-4BFF-8683-AAB19CA2C6E9} = {B9567541-C38C-41E4-A5B6-F51817C4E384}
+	EndGlobalSection
+EndGlobal
