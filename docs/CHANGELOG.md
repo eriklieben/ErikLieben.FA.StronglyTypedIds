@@ -1,3 +1,9 @@
+## [2.0.2](https://github.com/eriklieben/ErikLieben.FA.StronglyTypedIds/compare/v2.0.1...v2.0.2) (2025-08-21)
+
+### ⬆️ Dependency updates
+
+* **deps:** Pin dependency @semantic-release/changelog to 6.0.3 (main) ([28e0d5d](https://github.com/eriklieben/ErikLieben.FA.StronglyTypedIds/commit/28e0d5dd6124c110cdbe0043788ee51b48cef040))
+
 ## [2.0.1](https://github.com/eriklieben/ErikLieben.FA.StronglyTypedIds/compare/v2.0.0...v2.0.1) (2025-08-20)
 
 ### 🐛 Bug fixes
