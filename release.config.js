@@ -91,7 +91,7 @@ module.exports = {
       "@semantic-release/exec",
       {
         "verifyReleaseCmd": "echo '##vso[task.setvariable variable=PackageVersion]${nextRelease.version}'",
-        "prepareCmd": "./build-packages.sh ${nextRelease.version}"
+        "prepareCmd": "pwsh -File ./build-packages.ps1 -PackageVersion ${nextRelease.version}"
       }
     ],
     [ 
