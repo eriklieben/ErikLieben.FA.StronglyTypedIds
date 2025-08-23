@@ -23,15 +23,17 @@
     <!-- Symbol package settings -->
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+	  <EmbedUntrackedSources>true</EmbedUntrackedSources>
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- Use local project as Analyzer so it is packed inside this package and works without a published generator package -->
     <ProjectReference Include="..\ErikLieben.FA.StronglyTypedIds.Generator\ErikLieben.FA.StronglyTypedIds.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    <!-- Ensure the analyzer DLL is included in the NuGet package under analyzers/dotnet/cs -->
+    <None Include="..\ErikLieben.FA.StronglyTypedIds.Generator\bin\$(Configuration)\netstandard2.0\ErikLieben.FA.StronglyTypedIds.Generator.dll" Pack="true" PackagePath="analyzers/dotnet/cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <!-- Include repository root README and LICENSE in the package root -->
     <None Include="..\\..\\README.md" Pack="true" PackagePath="" />
     <None Include="..\\..\\LICENSE" Pack="true" PackagePath="" />
   </ItemGroup>
