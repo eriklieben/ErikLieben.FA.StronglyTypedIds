@@ -1,3 +1,9 @@
+## [2.0.4](https://github.com/eriklieben/ErikLieben.FA.StronglyTypedIds/compare/v2.0.3...v2.0.4) (2025-08-23)
+
+### 🐛 Bug fixes
+
+* correct link to generator package ([627cfa6](https://github.com/eriklieben/ErikLieben.FA.StronglyTypedIds/commit/627cfa6eb02bf89abada6699708159ba5c711261))
+
 ## [2.0.3](https://github.com/eriklieben/ErikLieben.FA.StronglyTypedIds/compare/v2.0.2...v2.0.3) (2025-08-21)
 
 ## [2.0.2](https://github.com/eriklieben/ErikLieben.FA.StronglyTypedIds/compare/v2.0.1...v2.0.2) (2025-08-21)
