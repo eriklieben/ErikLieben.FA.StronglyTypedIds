@@ -1,3 +1,9 @@
+## [2.0.5](https://github.com/eriklieben/ErikLieben.FA.StronglyTypedIds/compare/v2.0.4...v2.0.5) (2025-08-24)
+
+### 🐛 Bug fixes
+
+* add version tags to csproj ([4b7af17](https://github.com/eriklieben/ErikLieben.FA.StronglyTypedIds/commit/4b7af17d9600f9a0c912b42f54e3eda984d764f3))
+
 ## [2.0.4](https://github.com/eriklieben/ErikLieben.FA.StronglyTypedIds/compare/v2.0.3...v2.0.4) (2025-08-23)
 
 ### 🐛 Bug fixes
