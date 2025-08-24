@@ -17,6 +17,11 @@
         <PackageType>Analyzer</PackageType>
         <IsRoslynAnalyzer>true</IsRoslynAnalyzer>
 
+        <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+        <GenerateAssemblyVersionAttribute>true</GenerateAssemblyVersionAttribute>
+        <GenerateAssemblyFileVersionAttribute>true</GenerateAssemblyFileVersionAttribute>
+        <GenerateAssemblyInformationalVersionAttribute>true</GenerateAssemblyInformationalVersionAttribute>
+
 		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
 		<IncludeSymbols>false</IncludeSymbols>
     </PropertyGroup>
