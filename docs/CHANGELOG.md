@@ -1,3 +1,9 @@
+## [2.0.6](https://github.com/eriklieben/ErikLieben.FA.StronglyTypedIds/compare/v2.0.5...v2.0.6) (2025-09-13)
+
+### ⬆️ Dependency updates
+
+* **deps:** Update dependency @semantic-release/release-notes-generator to 14.1.0 (main) ([#8](https://github.com/eriklieben/ErikLieben.FA.StronglyTypedIds/issues/8)) ([06bb368](https://github.com/eriklieben/ErikLieben.FA.StronglyTypedIds/commit/06bb36892cafc113a9aceb70885a35a1bc64dd89))
+
 ## [2.0.5](https://github.com/eriklieben/ErikLieben.FA.StronglyTypedIds/compare/v2.0.4...v2.0.5) (2025-08-24)
 
 ### 🐛 Bug fixes
