@@ -1,3 +1,9 @@
+## [2.0.7](https://github.com/eriklieben/ErikLieben.FA.StronglyTypedIds/compare/v2.0.6...v2.0.7) (2025-09-18)
+
+### ⬆️ Dependency updates
+
+* **deps:** Update dependency dotnet-sdk to 9.0.305 (main) ([#9](https://github.com/eriklieben/ErikLieben.FA.StronglyTypedIds/issues/9)) ([f537c69](https://github.com/eriklieben/ErikLieben.FA.StronglyTypedIds/commit/f537c69e39fa8bff050ae68c3a7f6c9ae1a914a7))
+
 ## [2.0.6](https://github.com/eriklieben/ErikLieben.FA.StronglyTypedIds/compare/v2.0.5...v2.0.6) (2025-09-13)
 
 ### ⬆️ Dependency updates
