@@ -119,7 +119,10 @@ public class StronglyTypedIdSupportGenerator : IIncrementalGenerator
         if (valueProperty == null)
             return null;
 
-        var underlyingType = valueProperty.Type.ToDisplayString();
+        // Get fully qualified type name to ensure consistent type name handling
+        var underlyingType = valueProperty.Type.SpecialType != SpecialType.None
+            ? valueProperty.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat).Replace("global::", "")
+            : valueProperty.Type.ToDisplayString();
 
         var recordInfo = new RecordInfo
         {
