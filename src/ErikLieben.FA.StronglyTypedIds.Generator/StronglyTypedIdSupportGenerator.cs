@@ -154,6 +154,7 @@ public class StronglyTypedIdSupportGenerator : IIncrementalGenerator
         sb.AppendLine();
 
         // Add usings conditionally
+        sb.AppendLine("using System.Diagnostics;");
         if (recordInfo.GenerateComparisons && IsComparable(recordInfo.UnderlyingType))
         {
             sb.AppendLine("using System.Collections.Generic;");
@@ -166,12 +167,7 @@ public class StronglyTypedIdSupportGenerator : IIncrementalGenerator
         {
             sb.AppendLine("using System.Text.Json.Serialization;");
         }
-        if ((recordInfo.GenerateComparisons && IsComparable(recordInfo.UnderlyingType)) ||
-            recordInfo.GenerateTypeConverter ||
-            recordInfo.GenerateJsonConverter)
-        {
-            sb.AppendLine();
-        }
+        sb.AppendLine();
 
         // Add namespace if needed
         if (!string.IsNullOrEmpty(recordInfo.Namespace) && recordInfo.Namespace != "<global namespace>")
@@ -182,6 +178,9 @@ public class StronglyTypedIdSupportGenerator : IIncrementalGenerator
 
         // Generate partial record with attributes
         var attributes = new List<string>();
+
+        // Always add DebuggerDisplay for better debugging experience
+        attributes.Add($"[DebuggerDisplay(\"{{Value}}\")]");
 
         if (recordInfo.GenerateJsonConverter)
         {
@@ -202,7 +201,16 @@ public class StronglyTypedIdSupportGenerator : IIncrementalGenerator
         sb.AppendLine("/// <summary>");
         sb.AppendLine($"/// Partial record extension for {recordInfo.Name} with generated support methods and attributes");
         sb.AppendLine("/// </summary>");
-        sb.AppendLine($"public partial record {recordInfo.Name}");
+
+        // Implement IComparable<T> when comparisons are enabled
+        if (recordInfo.GenerateComparisons && IsComparable(recordInfo.UnderlyingType))
+        {
+            sb.AppendLine($"public partial record {recordInfo.Name} : IComparable<{recordInfo.Name}>");
+        }
+        else
+        {
+            sb.AppendLine($"public partial record {recordInfo.Name}");
+        }
         sb.AppendLine("{");
 
         // Add static methods if requested
@@ -275,6 +283,19 @@ public class StronglyTypedIdSupportGenerator : IIncrementalGenerator
         // Generate comparison operators if requested
         if (recordInfo.GenerateComparisons && IsComparable(recordInfo.UnderlyingType))
         {
+            // Implement IComparable<T>.CompareTo
+            sb.AppendLine("    /// <summary>");
+            sb.AppendLine("    /// Compares this instance to another instance");
+            sb.AppendLine("    /// </summary>");
+            sb.AppendLine($"    /// <param name=\"other\">The other {recordInfo.Name} to compare to</param>");
+            sb.AppendLine("    /// <returns>A value indicating the relative order of the objects being compared</returns>");
+            sb.AppendLine($"    public int CompareTo({recordInfo.Name}? other)");
+            sb.AppendLine("    {");
+            sb.AppendLine("        if (other is null) return 1;");
+            sb.AppendLine($"        return Comparer<{GetCSharpTypeName(recordInfo.UnderlyingType)}>.Default.Compare(Value, other.Value);");
+            sb.AppendLine("    }");
+            sb.AppendLine();
+
             sb.AppendLine("    /// <summary>");
             sb.AppendLine("    /// Less than operator");
             sb.AppendLine("    /// </summary>");
@@ -370,6 +391,12 @@ public class StronglyTypedIdSupportGenerator : IIncrementalGenerator
         if (recordInfo.GenerateExtensions)
         {
             GenerateExtensionMethods(sb, recordInfo);
+        }
+
+        // Generate TryConvert helper if needed for unsupported types
+        if (NeedsTryConvertHelper(recordInfo))
+        {
+            GenerateTryConvertHelper(sb);
         }
 
         return sb.ToString();
@@ -506,27 +533,86 @@ public class StronglyTypedIdSupportGenerator : IIncrementalGenerator
         "Guid" => $"Guid.Parse({value})",
         "int" => $"int.Parse({value})",
         "long" => $"long.Parse({value})",
+        "decimal" => $"decimal.Parse({value})",
+        "short" => $"short.Parse({value})",
+        "byte" => $"byte.Parse({value})",
+        "double" => $"double.Parse({value})",
+        "float" => $"float.Parse({value})",
         "string" => value,
         "DateTime" => $"DateTime.Parse({value})",
         "DateTimeOffset" => $"DateTimeOffset.Parse({value})",
         _ => $"({GetCSharpTypeName(type)})Convert.ChangeType({value}, typeof({GetCSharpTypeName(type)}))"
     };
 
-    private static string GetTryParseExpression(string type, string value, string result) => GetCSharpTypeName(type) switch
+    private static string GetTryParseExpression(string type, string value, string result)
     {
-        "Guid" => $"Guid.TryParse({value}, out var {result})",
-        "int" => $"int.TryParse({value}, out var {result})",
-        "long" => $"long.TryParse({value}, out var {result})",
-        "DateTime" => $"DateTime.TryParse({value}, out var {result})",
-        "DateTimeOffset" => $"DateTimeOffset.TryParse({value}, out var {result})",
-        _ => $"TryParseGeneric<{GetCSharpTypeName(type)}>({value}, out var {result})"
-    };
+        var typeName = GetCSharpTypeName(type);
+        return typeName switch
+        {
+            "Guid" => $"Guid.TryParse({value}, out var {result})",
+            "int" => $"int.TryParse({value}, out var {result})",
+            "long" => $"long.TryParse({value}, out var {result})",
+            "decimal" => $"decimal.TryParse({value}, out var {result})",
+            "short" => $"short.TryParse({value}, out var {result})",
+            "byte" => $"byte.TryParse({value}, out var {result})",
+            "double" => $"double.TryParse({value}, out var {result})",
+            "float" => $"float.TryParse({value}, out var {result})",
+            "DateTime" => $"DateTime.TryParse({value}, out var {result})",
+            "DateTimeOffset" => $"DateTimeOffset.TryParse({value}, out var {result})",
+            _ => GenerateTryParseWithConvert(typeName, value, result)
+        };
+    }
+
+    private static string GenerateTryParseWithConvert(string type, string value, string result)
+    {
+        // For unsupported types, use the ConversionHelper
+        return $@"ConversionHelper.TryConvert<{type}>({value}, out var {result})";
+    }
+
+    private static bool NeedsTryConvertHelper(RecordInfo recordInfo)
+    {
+        var typeName = GetCSharpTypeName(recordInfo.UnderlyingType);
+        return recordInfo.GenerateTryParseMethod && typeName switch
+        {
+            "Guid" or "int" or "long" or "decimal" or "short" or "byte" or "double" or "float" or "DateTime" or "DateTimeOffset" or "string" => false,
+            _ => true
+        };
+    }
+
+    private static void GenerateTryConvertHelper(StringBuilder sb)
+    {
+        sb.AppendLine("/// <summary>");
+        sb.AppendLine("/// Helper method to try converting a string to a target type");
+        sb.AppendLine("/// </summary>");
+        sb.AppendLine("internal static class ConversionHelper");
+        sb.AppendLine("{");
+        sb.AppendLine("    internal static bool TryConvert<T>(string value, out T result)");
+        sb.AppendLine("    {");
+        sb.AppendLine("        result = default!;");
+        sb.AppendLine("        try");
+        sb.AppendLine("        {");
+        sb.AppendLine("            result = (T)Convert.ChangeType(value, typeof(T));");
+        sb.AppendLine("            return true;");
+        sb.AppendLine("        }");
+        sb.AppendLine("        catch");
+        sb.AppendLine("        {");
+        sb.AppendLine("            return false;");
+        sb.AppendLine("        }");
+        sb.AppendLine("    }");
+        sb.AppendLine("}");
+        sb.AppendLine();
+    }
 
     private static string GetNewValueExpression(string type) => GetCSharpTypeName(type) switch
     {
         "Guid" => "Guid.NewGuid()",
         "int" => "Random.Shared.Next()",
         "long" => "Random.Shared.NextInt64()",
+        "decimal" => "(decimal)Random.Shared.NextDouble() * 1000000",
+        "short" => "(short)Random.Shared.Next(short.MinValue, short.MaxValue)",
+        "byte" => "(byte)Random.Shared.Next(byte.MinValue, byte.MaxValue)",
+        "double" => "Random.Shared.NextDouble()",
+        "float" => "(float)Random.Shared.NextDouble()",
         "string" => "Guid.NewGuid().ToString()",
         "DateTime" => "DateTime.UtcNow",
         "DateTimeOffset" => "DateTimeOffset.UtcNow",
@@ -539,6 +625,11 @@ public class StronglyTypedIdSupportGenerator : IIncrementalGenerator
         "System.Guid" => "Guid",
         "System.Int32" => "int",
         "System.Int64" => "long",
+        "System.Decimal" => "decimal",
+        "System.Int16" => "short",
+        "System.Byte" => "byte",
+        "System.Double" => "double",
+        "System.Single" => "float",
         "System.String" => "string",
         "System.DateTime" => "DateTime",
         "System.DateTimeOffset" => "DateTimeOffset",
@@ -550,6 +641,11 @@ public class StronglyTypedIdSupportGenerator : IIncrementalGenerator
         "Guid" => "reader.GetGuid()",
         "int" => "reader.GetInt32()",
         "long" => "reader.GetInt64()",
+        "decimal" => "reader.GetDecimal()",
+        "short" => "reader.GetInt16()",
+        "byte" => "reader.GetByte()",
+        "double" => "reader.GetDouble()",
+        "float" => "reader.GetSingle()",
         "string" => "reader.GetString() ?? string.Empty",
         "DateTime" => "reader.GetDateTime()",
         "DateTimeOffset" => "reader.GetDateTimeOffset()",
@@ -561,6 +657,11 @@ public class StronglyTypedIdSupportGenerator : IIncrementalGenerator
         "Guid" => $"writer.WriteStringValue({value})",
         "int" => $"writer.WriteNumberValue({value})",
         "long" => $"writer.WriteNumberValue({value})",
+        "decimal" => $"writer.WriteNumberValue({value})",
+        "short" => $"writer.WriteNumberValue({value})",
+        "byte" => $"writer.WriteNumberValue({value})",
+        "double" => $"writer.WriteNumberValue({value})",
+        "float" => $"writer.WriteNumberValue({value})",
         "string" => $"writer.WriteStringValue({value})",
         "DateTime" => $"writer.WriteStringValue({value})",
         "DateTimeOffset" => $"writer.WriteStringValue({value})",
@@ -588,6 +689,11 @@ public class StronglyTypedIdSupportGenerator : IIncrementalGenerator
         "System.Guid" or "Guid" => true,
         "System.Int32" or "int" => true,
         "System.Int64" or "long" => true,
+        "System.Decimal" or "decimal" => true,
+        "System.Int16" or "short" => true,
+        "System.Byte" or "byte" => true,
+        "System.Double" or "double" => true,
+        "System.Single" or "float" => true,
         "System.String" or "string" => true,
         "System.DateTime" or "DateTime" => true,
         "System.DateTimeOffset" or "DateTimeOffset" => true,

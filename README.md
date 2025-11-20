@@ -137,19 +137,27 @@ public partial record ProductId(int Value) : StronglyTypedId<int>(Value);
 var id = ProductId.New();        // Random.Shared.Next()
 var specific = ProductId.From("42"); // int.Parse("42")
 
-// Comparison operators work naturally
+// Comparison operators work naturally (IComparable<T> is implemented)
 ProductId a = ProductId.From("1");
 ProductId b = ProductId.From("2");
 bool less = a < b;  // true
+int comparison = a.CompareTo(b);  // -1
 ```
 
-### Long-based IDs
+### Other Numeric IDs
 
 ```csharp
 [GenerateStronglyTypedIdSupport]
 public partial record OrderId(long Value) : StronglyTypedId<long>(Value);
 
-var id = OrderId.New();  // Random.Shared.NextInt64()
+[GenerateStronglyTypedIdSupport]
+public partial record SequenceId(short Value) : StronglyTypedId<short>(Value);
+
+[GenerateStronglyTypedIdSupport]
+public partial record BatchId(byte Value) : StronglyTypedId<byte>(Value);
+
+// All numeric types supported: int, long, decimal, short, byte, double, float
+// Choose based on your domain needs and external system constraints
 ```
 
 ### String-based IDs
@@ -212,7 +220,22 @@ var later = TimestampId.From("2024-12-31T23:59:59Z");
 bool isEarlier = early < later;   // true
 bool isSame = early == later;     // false (record equality)
 bool isLaterOrEqual = later >= early; // true
+
+// IComparable<T> is implemented for sortable types
+int compareResult = early.CompareTo(later);  // -1 (early comes before later)
+var sorted = new[] { later, early }.OrderBy(x => x).ToArray();  // [early, later]
 ```
+
+### Debugging Experience
+
+All generated IDs include a `DebuggerDisplay` attribute for a better debugging experience:
+
+```csharp
+var userId = UserId.New();
+// In debugger: shows "550e8400-e29b-41d4-a716-446655440000" instead of "UserId { Value = ... }"
+```
+
+The generated code also includes comprehensive XML documentation and avoids unnecessary using directives for a cleaner codebase.
 
 ### Factory Methods
 
@@ -338,8 +361,10 @@ Generated code includes:
 - JSON converters compatible with System.Text.Json
 - Type converters for model binding and configuration
 - Static factory and parsing methods
-- Comparison operators when applicable
+- Comparison operators and `IComparable<T>` implementation when applicable
 - Extension methods for common operations
+- `DebuggerDisplay` attribute for improved debugging
+- Comprehensive XML documentation
 
 All generation happens at **compile time** - there's no runtime reflection or performance impact.
 
