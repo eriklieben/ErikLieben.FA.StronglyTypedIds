@@ -2,7 +2,7 @@
 
 [![NuGet](https://img.shields.io/nuget/v/ErikLieben.FA.StronglyTypedIds?style=flat-square)](https://www.nuget.org/packages/ErikLieben.FA.StronglyTypedIds)
 [![Changelog](https://img.shields.io/badge/Changelog-docs-informational?style=flat-square)](docs/CHANGELOG.md)
-[![.NET 9.0](https://img.shields.io/badge/.NET-9.0-blue?style=flat-square)](https://dotnet.microsoft.com/download/dotnet/9.0)
+[![.NET 8.0 | 9.0 | 10.0](https://img.shields.io/badge/.NET-8.0%20%7C%209.0%20%7C%2010.0-blue?style=flat-square)](https://dotnet.microsoft.com)
 
 
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=eriklieben_ErikLieben.FA.StronglyTypedIds&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=eriklieben_ErikLieben.FA.StronglyTypedIds)
@@ -72,6 +72,10 @@ Use them like value objects with generated capabilities:
 // Factory methods
 var accountId = AccountId.New();           // Generates new Guid
 var productId = ProductId.New();           // Random int
+var emptyId = AccountId.Empty;             // Static empty value for Guid/DateTime types
+
+// Implicit conversion from underlying type
+AccountId id = Guid.NewGuid();             // Clean and concise!
 
 // Parsing
 var parsed = AccountId.From("550e8400-e29b-41d4-a716-446655440000");
@@ -79,6 +83,9 @@ if (ProductId.TryParse("123", out var tryParsed))
 {
     Console.WriteLine($"Parsed: {tryParsed}");
 }
+
+// Culture-specific parsing for numeric/date types
+var decimalId = DecimalId.From("1.234,56", CultureInfo.GetCultureInfo("de-DE"));
 
 // Type safety - this won't compile!
 // ProcessAccount(productId);  // ❌ Compiler error
@@ -137,19 +144,27 @@ public partial record ProductId(int Value) : StronglyTypedId<int>(Value);
 var id = ProductId.New();        // Random.Shared.Next()
 var specific = ProductId.From("42"); // int.Parse("42")
 
-// Comparison operators work naturally
+// Comparison operators work naturally (IComparable<T> is implemented)
 ProductId a = ProductId.From("1");
 ProductId b = ProductId.From("2");
 bool less = a < b;  // true
+int comparison = a.CompareTo(b);  // -1
 ```
 
-### Long-based IDs
+### Other Numeric IDs
 
 ```csharp
 [GenerateStronglyTypedIdSupport]
 public partial record OrderId(long Value) : StronglyTypedId<long>(Value);
 
-var id = OrderId.New();  // Random.Shared.NextInt64()
+[GenerateStronglyTypedIdSupport]
+public partial record SequenceId(short Value) : StronglyTypedId<short>(Value);
+
+[GenerateStronglyTypedIdSupport]
+public partial record BatchId(byte Value) : StronglyTypedId<byte>(Value);
+
+// All numeric types supported: int, long, decimal, short, byte, double, float
+// Choose based on your domain needs and external system constraints
 ```
 
 ### String-based IDs
@@ -212,7 +227,22 @@ var later = TimestampId.From("2024-12-31T23:59:59Z");
 bool isEarlier = early < later;   // true
 bool isSame = early == later;     // false (record equality)
 bool isLaterOrEqual = later >= early; // true
+
+// IComparable<T> is implemented for sortable types
+int compareResult = early.CompareTo(later);  // -1 (early comes before later)
+var sorted = new[] { later, early }.OrderBy(x => x).ToArray();  // [early, later]
 ```
+
+### Debugging Experience
+
+All generated IDs include a `DebuggerDisplay` attribute for a better debugging experience:
+
+```csharp
+var userId = UserId.New();
+// In debugger: shows "550e8400-e29b-41d4-a716-446655440000" instead of "UserId { Value = ... }"
+```
+
+The generated code also includes comprehensive XML documentation and avoids unnecessary using directives for a cleaner codebase.
 
 ### Factory Methods
 
@@ -222,6 +252,33 @@ var accountId = AccountId.New();    // New Guid
 var productId = ProductId.New();    // Random int
 var timestamp = TimestampId.New();  // Current UTC time
 var key = ExternalKey.New();        // Guid as string
+
+// Static Empty property for types with natural empty values
+var emptyGuid = UserId.Empty;       // new UserId(Guid.Empty)
+var emptyDate = TimestampId.Empty;  // new TimestampId(DateTime.MinValue)
+
+// Implicit conversion from underlying type
+UserId userId = Guid.NewGuid();     // Implicit conversion
+Guid guid = (Guid)userId;           // Explicit conversion to underlying type
+```
+
+### Culture-Specific Parsing
+
+For numeric and DateTime types, format provider overloads are generated:
+
+```csharp
+// Parse with specific culture
+var germanDecimal = DecimalId.From("1.234,56", CultureInfo.GetCultureInfo("de-DE"));
+var usDecimal = DecimalId.From("1,234.56", CultureInfo.GetCultureInfo("en-US"));
+
+// TryParse with culture
+if (DecimalId.TryParse("1.234,56", CultureInfo.GetCultureInfo("de-DE"), out var result))
+{
+    Console.WriteLine($"Parsed: {result}");
+}
+
+// Works with DateTime too
+var germanDate = DateId.From("31.12.2024", CultureInfo.GetCultureInfo("de-DE"));
 ```
 
 ### Extension Methods
@@ -337,9 +394,14 @@ The Roslyn source generator:
 Generated code includes:
 - JSON converters compatible with System.Text.Json
 - Type converters for model binding and configuration
-- Static factory and parsing methods
-- Comparison operators when applicable
+- Static factory and parsing methods (with optional culture-specific overloads)
+- Comparison operators and `IComparable<T>` implementation when applicable
+- Implicit/explicit conversion operators for cleaner syntax
+- Static `Empty` property for types with natural empty values
 - Extension methods for common operations
+- `DebuggerDisplay` attribute for improved debugging
+- Comprehensive XML documentation
+- Optimized using directives (only includes what's needed)
 
 All generation happens at **compile time** - there's no runtime reflection or performance impact.
 

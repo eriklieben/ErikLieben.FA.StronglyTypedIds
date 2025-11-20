@@ -87,3 +87,4 @@ artifacts/
 *.aspnetcache/
 
 node_modules
+TestResults

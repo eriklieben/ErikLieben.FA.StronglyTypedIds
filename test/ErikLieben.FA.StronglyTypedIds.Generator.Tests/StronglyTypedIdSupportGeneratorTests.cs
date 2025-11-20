@@ -44,11 +44,13 @@ public class StronglyTypedIdSupportGeneratorTests
             Assert.Contains("[JsonConverter(typeof(OrderIdJsonConverter))]", partial);
             Assert.Contains("[TypeConverter(typeof(OrderIdTypeConverter))]", partial);
             Assert.Contains("public static OrderId From(string value)", partial);
-            Assert.Contains("public static bool TryParse(string? value, out OrderId result)", partial);
+            Assert.Contains("public static bool TryParse(string? value, out OrderId? result)", partial);
             Assert.Contains("public static OrderId New() => new(Guid.NewGuid())", partial);
             // Comparison operators for comparable Guid
             Assert.Contains("public static bool operator <(OrderId left, OrderId right)", partial);
             Assert.Contains("public static bool operator >=(OrderId left, OrderId right)", partial);
+            // IComparable<T> interface
+            Assert.Contains("public int CompareTo(OrderId? other)", partial);
         }
 
         [Fact]
@@ -80,7 +82,7 @@ public class StronglyTypedIdSupportGeneratorTests
             Assert.DoesNotContain("IsEmpty(this CustomerId id)", support);
 
             // Partial: TryParse should be trivial assignment for string
-            Assert.Contains("public static bool TryParse(string? value, out CustomerId result)", partial);
+            Assert.Contains("public static bool TryParse(string? value, out CustomerId? result)", partial);
             Assert.Contains("result = new CustomerId(value);", partial);
             Assert.Contains("return true;", partial);
             // New uses Guid.NewGuid().ToString()
@@ -182,6 +184,325 @@ public class StronglyTypedIdSupportGeneratorTests
             Assert.DoesNotContain("JsonConverter", support);
             Assert.DoesNotContain("TypeConverter", support);
             Assert.DoesNotContain("static class DisabledIdExtensions", support);
+        }
+
+        [Fact]
+        public void Should_generate_support_for_decimal_short_byte_double_float_types()
+        {
+            // Arrange
+            var attributeSource = @"using System; namespace ErikLieben.FA.StronglyTypedIds { [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)] public class GenerateStronglyTypedIdSupportAttribute : Attribute { public bool GenerateJsonConverter {get;set;}=true; public bool GenerateTypeConverter {get;set;}=true; public bool GenerateParseMethod {get;set;}=true; public bool GenerateTryParseMethod {get;set;}=true; public bool GenerateComparisons {get;set;}=true; public bool GenerateNewMethod {get;set;}=true; public bool GenerateExtensions {get;set;}=true; } }";
+            var idSources = new[] {
+                "namespace Demo { using System; using ErikLieben.FA.StronglyTypedIds; [GenerateStronglyTypedIdSupport] public readonly record struct DecimalId(decimal Value); }",
+                "namespace Demo { using System; using ErikLieben.FA.StronglyTypedIds; [GenerateStronglyTypedIdSupport] public readonly record struct ShortId(short Value); }",
+                "namespace Demo { using System; using ErikLieben.FA.StronglyTypedIds; [GenerateStronglyTypedIdSupport] public readonly record struct ByteId(byte Value); }",
+                "namespace Demo { using System; using ErikLieben.FA.StronglyTypedIds; [GenerateStronglyTypedIdSupport] public readonly record struct DoubleId(double Value); }",
+                "namespace Demo { using System; using ErikLieben.FA.StronglyTypedIds; [GenerateStronglyTypedIdSupport] public readonly record struct FloatId(float Value); }"
+            };
+            var compilation = CreateCompilation(new[] { attributeSource }.Concat(idSources).ToArray());
+            var generator = new StronglyTypedIdSupportGenerator();
+            GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
+
+            // Act
+            driver.RunGeneratorsAndUpdateCompilation(compilation, out var updatedCompilation, out var _);
+
+            // Assert decimal
+            var decimalSupport = updatedCompilation.SyntaxTrees.First(t => t.FilePath.EndsWith("DecimalId.Support.g.cs", StringComparison.Ordinal)).ToString();
+            var decimalPartial = updatedCompilation.SyntaxTrees.First(t => t.FilePath.EndsWith("DecimalId.Partial.g.cs", StringComparison.Ordinal)).ToString();
+            Assert.Contains("reader.GetDecimal()", decimalSupport);
+            Assert.Contains("writer.WriteNumberValue(value.Value)", decimalSupport);
+            Assert.Contains("decimal.TryParse(value, out var parsedValue)", decimalPartial);
+
+            // Assert short
+            var shortSupport = updatedCompilation.SyntaxTrees.First(t => t.FilePath.EndsWith("ShortId.Support.g.cs", StringComparison.Ordinal)).ToString();
+            var shortPartial = updatedCompilation.SyntaxTrees.First(t => t.FilePath.EndsWith("ShortId.Partial.g.cs", StringComparison.Ordinal)).ToString();
+            Assert.Contains("reader.GetInt16()", shortSupport);
+            Assert.Contains("short.TryParse(value, out var parsedValue)", shortPartial);
+
+            // Assert byte
+            var byteSupport = updatedCompilation.SyntaxTrees.First(t => t.FilePath.EndsWith("ByteId.Support.g.cs", StringComparison.Ordinal)).ToString();
+            var bytePartial = updatedCompilation.SyntaxTrees.First(t => t.FilePath.EndsWith("ByteId.Partial.g.cs", StringComparison.Ordinal)).ToString();
+            Assert.Contains("reader.GetByte()", byteSupport);
+            Assert.Contains("byte.TryParse(value, out var parsedValue)", bytePartial);
+
+            // Assert double
+            var doubleSupport = updatedCompilation.SyntaxTrees.First(t => t.FilePath.EndsWith("DoubleId.Support.g.cs", StringComparison.Ordinal)).ToString();
+            var doublePartial = updatedCompilation.SyntaxTrees.First(t => t.FilePath.EndsWith("DoubleId.Partial.g.cs", StringComparison.Ordinal)).ToString();
+            Assert.Contains("reader.GetDouble()", doubleSupport);
+            Assert.Contains("double.TryParse(value, out var parsedValue)", doublePartial);
+
+            // Assert float
+            var floatSupport = updatedCompilation.SyntaxTrees.First(t => t.FilePath.EndsWith("FloatId.Support.g.cs", StringComparison.Ordinal)).ToString();
+            var floatPartial = updatedCompilation.SyntaxTrees.First(t => t.FilePath.EndsWith("FloatId.Partial.g.cs", StringComparison.Ordinal)).ToString();
+            Assert.Contains("reader.GetSingle()", floatSupport);
+            Assert.Contains("float.TryParse(value, out var parsedValue)", floatPartial);
+        }
+
+        [Fact]
+        public void Should_generate_static_empty_property_for_guid_and_datetime_types()
+        {
+            // Arrange
+            var attributeSource = @"using System; namespace ErikLieben.FA.StronglyTypedIds { [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)] public class GenerateStronglyTypedIdSupportAttribute : Attribute { public bool GenerateJsonConverter {get;set;}=true; public bool GenerateTypeConverter {get;set;}=true; public bool GenerateParseMethod {get;set;}=true; public bool GenerateTryParseMethod {get;set;}=true; public bool GenerateComparisons {get;set;}=true; public bool GenerateNewMethod {get;set;}=true; public bool GenerateExtensions {get;set;}=true; } }";
+            var idSources = new[] {
+                "namespace Demo { using System; using ErikLieben.FA.StronglyTypedIds; [GenerateStronglyTypedIdSupport] public readonly record struct GuidId(Guid Value); }",
+                "namespace Demo { using System; using ErikLieben.FA.StronglyTypedIds; [GenerateStronglyTypedIdSupport] public readonly record struct DateId(DateTime Value); }",
+                "namespace Demo { using System; using ErikLieben.FA.StronglyTypedIds; [GenerateStronglyTypedIdSupport] public readonly record struct OffsetId(DateTimeOffset Value); }",
+                "namespace Demo { using System; using ErikLieben.FA.StronglyTypedIds; [GenerateStronglyTypedIdSupport] public readonly record struct IntId(int Value); }"
+            };
+            var compilation = CreateCompilation(new[] { attributeSource }.Concat(idSources).ToArray());
+            var generator = new StronglyTypedIdSupportGenerator();
+            GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
+
+            // Act
+            driver.RunGeneratorsAndUpdateCompilation(compilation, out var updatedCompilation, out var _);
+
+            // Assert Empty property exists for Guid, DateTime, DateTimeOffset
+            var guidPartial = updatedCompilation.SyntaxTrees.First(t => t.FilePath.EndsWith("GuidId.Partial.g.cs", StringComparison.Ordinal)).ToString();
+            Assert.Contains("public static GuidId Empty { get; } = new(Guid.Empty)", guidPartial);
+
+            var datePartial = updatedCompilation.SyntaxTrees.First(t => t.FilePath.EndsWith("DateId.Partial.g.cs", StringComparison.Ordinal)).ToString();
+            Assert.Contains("public static DateId Empty { get; } = new(DateTime.MinValue)", datePartial);
+
+            var offsetPartial = updatedCompilation.SyntaxTrees.First(t => t.FilePath.EndsWith("OffsetId.Partial.g.cs", StringComparison.Ordinal)).ToString();
+            Assert.Contains("public static OffsetId Empty { get; } = new(DateTimeOffset.MinValue)", offsetPartial);
+
+            // Assert Empty property does NOT exist for int
+            var intPartial = updatedCompilation.SyntaxTrees.First(t => t.FilePath.EndsWith("IntId.Partial.g.cs", StringComparison.Ordinal)).ToString();
+            Assert.DoesNotContain("public static IntId Empty", intPartial);
+        }
+
+        [Fact]
+        public void Should_generate_implicit_and_explicit_conversion_operators()
+        {
+            // Arrange
+            var attributeSource = @"using System; namespace ErikLieben.FA.StronglyTypedIds { [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)] public class GenerateStronglyTypedIdSupportAttribute : Attribute { public bool GenerateJsonConverter {get;set;}=true; public bool GenerateTypeConverter {get;set;}=true; public bool GenerateParseMethod {get;set;}=true; public bool GenerateTryParseMethod {get;set;}=true; public bool GenerateComparisons {get;set;}=true; public bool GenerateNewMethod {get;set;}=true; public bool GenerateExtensions {get;set;}=true; } }";
+            var idSource = @"namespace Demo { using System; using ErikLieben.FA.StronglyTypedIds; [GenerateStronglyTypedIdSupport] public readonly record struct UserId(Guid Value); }";
+            var compilation = CreateCompilation(new[] { attributeSource, idSource });
+            var generator = new StronglyTypedIdSupportGenerator();
+            GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
+
+            // Act
+            driver.RunGeneratorsAndUpdateCompilation(compilation, out var updatedCompilation, out var _);
+
+            // Assert
+            var partial = updatedCompilation.SyntaxTrees.First(t => t.FilePath.EndsWith("UserId.Partial.g.cs", StringComparison.Ordinal)).ToString();
+            Assert.Contains("public static implicit operator UserId(Guid value) => new(value)", partial);
+            Assert.Contains("public static explicit operator Guid(UserId value) => value.Value", partial);
+        }
+
+        [Fact]
+        public void Should_generate_icomparable_interface_and_compareto_method()
+        {
+            // Arrange
+            var attributeSource = @"using System; namespace ErikLieben.FA.StronglyTypedIds { [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)] public class GenerateStronglyTypedIdSupportAttribute : Attribute { public bool GenerateJsonConverter {get;set;}=true; public bool GenerateTypeConverter {get;set;}=true; public bool GenerateParseMethod {get;set;}=true; public bool GenerateTryParseMethod {get;set;}=true; public bool GenerateComparisons {get;set;}=true; public bool GenerateNewMethod {get;set;}=true; public bool GenerateExtensions {get;set;}=true; } }";
+            var idSource = @"namespace Demo { using System; using ErikLieben.FA.StronglyTypedIds; [GenerateStronglyTypedIdSupport] public readonly record struct OrderId(int Value); }";
+            var compilation = CreateCompilation(new[] { attributeSource, idSource });
+            var generator = new StronglyTypedIdSupportGenerator();
+            GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
+
+            // Act
+            driver.RunGeneratorsAndUpdateCompilation(compilation, out var updatedCompilation, out var _);
+
+            // Assert
+            var partial = updatedCompilation.SyntaxTrees.First(t => t.FilePath.EndsWith("OrderId.Partial.g.cs", StringComparison.Ordinal)).ToString();
+            Assert.Contains(": IComparable<OrderId>", partial);
+            Assert.Contains("public int CompareTo(OrderId? other)", partial);
+            Assert.Contains("if (other is null) return 1;", partial);
+            Assert.Contains("return Comparer<int>.Default.Compare(Value, other.Value)", partial);
+        }
+
+        [Fact]
+        public void Should_generate_debuggerdisplay_attribute()
+        {
+            // Arrange
+            var attributeSource = @"using System; namespace ErikLieben.FA.StronglyTypedIds { [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)] public class GenerateStronglyTypedIdSupportAttribute : Attribute { public bool GenerateJsonConverter {get;set;}=true; public bool GenerateTypeConverter {get;set;}=true; public bool GenerateParseMethod {get;set;}=true; public bool GenerateTryParseMethod {get;set;}=true; public bool GenerateComparisons {get;set;}=true; public bool GenerateNewMethod {get;set;}=true; public bool GenerateExtensions {get;set;}=true; } }";
+            var idSource = @"namespace Demo { using System; using ErikLieben.FA.StronglyTypedIds; [GenerateStronglyTypedIdSupport] public readonly record struct ProductId(int Value); }";
+            var compilation = CreateCompilation(new[] { attributeSource, idSource });
+            var generator = new StronglyTypedIdSupportGenerator();
+            GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
+
+            // Act
+            driver.RunGeneratorsAndUpdateCompilation(compilation, out var updatedCompilation, out var _);
+
+            // Assert
+            var partial = updatedCompilation.SyntaxTrees.First(t => t.FilePath.EndsWith("ProductId.Partial.g.cs", StringComparison.Ordinal)).ToString();
+            Assert.Contains("[DebuggerDisplay(\"{Value}\")]", partial);
+            Assert.Contains("using System.Diagnostics;", partial);
+        }
+
+        [Fact]
+        public void Should_generate_format_provider_overloads_for_numeric_types()
+        {
+            // Arrange
+            var attributeSource = @"using System; namespace ErikLieben.FA.StronglyTypedIds { [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)] public class GenerateStronglyTypedIdSupportAttribute : Attribute { public bool GenerateJsonConverter {get;set;}=true; public bool GenerateTypeConverter {get;set;}=true; public bool GenerateParseMethod {get;set;}=true; public bool GenerateTryParseMethod {get;set;}=true; public bool GenerateComparisons {get;set;}=true; public bool GenerateNewMethod {get;set;}=true; public bool GenerateExtensions {get;set;}=true; } }";
+            var idSources = new[] {
+                "namespace Demo { using System; using ErikLieben.FA.StronglyTypedIds; [GenerateStronglyTypedIdSupport] public readonly record struct DecimalId(decimal Value); }",
+                "namespace Demo { using System; using ErikLieben.FA.StronglyTypedIds; [GenerateStronglyTypedIdSupport] public readonly record struct DateId(DateTime Value); }",
+                "namespace Demo { using System; using ErikLieben.FA.StronglyTypedIds; [GenerateStronglyTypedIdSupport] public readonly record struct StringId(string Value); }"
+            };
+            var compilation = CreateCompilation(new[] { attributeSource }.Concat(idSources).ToArray());
+            var generator = new StronglyTypedIdSupportGenerator();
+            GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
+
+            // Act
+            driver.RunGeneratorsAndUpdateCompilation(compilation, out var updatedCompilation, out var _);
+
+            // Assert format provider overload exists for decimal
+            var decimalPartial = updatedCompilation.SyntaxTrees.First(t => t.FilePath.EndsWith("DecimalId.Partial.g.cs", StringComparison.Ordinal)).ToString();
+            Assert.Contains("public static DecimalId From(string value, IFormatProvider? provider)", decimalPartial);
+            Assert.Contains("decimal.Parse(value, provider)", decimalPartial);
+            Assert.Contains("public static bool TryParse(string? value, IFormatProvider? provider, out DecimalId? result)", decimalPartial);
+            Assert.Contains("decimal.TryParse(value, provider, out var parsedValue)", decimalPartial);
+
+            // Assert format provider overload exists for DateTime
+            var datePartial = updatedCompilation.SyntaxTrees.First(t => t.FilePath.EndsWith("DateId.Partial.g.cs", StringComparison.Ordinal)).ToString();
+            Assert.Contains("public static DateId From(string value, IFormatProvider? provider)", datePartial);
+            Assert.Contains("DateTime.Parse(value, provider)", datePartial);
+            Assert.Contains("public static bool TryParse(string? value, IFormatProvider? provider, out DateId? result)", datePartial);
+            Assert.Contains("DateTime.TryParse(value, provider, System.Globalization.DateTimeStyles.None, out var parsedValue)", datePartial);
+
+            // Assert format provider overload does NOT exist for string
+            var stringPartial = updatedCompilation.SyntaxTrees.First(t => t.FilePath.EndsWith("StringId.Partial.g.cs", StringComparison.Ordinal)).ToString();
+            Assert.DoesNotContain("IFormatProvider", stringPartial);
+        }
+
+        [Fact]
+        public void Should_generate_conversion_helper_for_unsupported_types()
+        {
+            // Arrange - using a custom type that doesn't have built-in TryParse
+            var attributeSource = @"using System; namespace ErikLieben.FA.StronglyTypedIds { [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)] public class GenerateStronglyTypedIdSupportAttribute : Attribute { public bool GenerateJsonConverter {get;set;}=true; public bool GenerateTypeConverter {get;set;}=true; public bool GenerateParseMethod {get;set;}=true; public bool GenerateTryParseMethod {get;set;}=true; public bool GenerateComparisons {get;set;}=true; public bool GenerateNewMethod {get;set;}=true; public bool GenerateExtensions {get;set;}=true; } }";
+            var customTypeSource = @"namespace Demo { public struct CustomType { public int Value; public override string ToString() => Value.ToString(); } }";
+            var idSource = @"namespace Demo { using System; using ErikLieben.FA.StronglyTypedIds; [GenerateStronglyTypedIdSupport] public readonly record struct CustomId(CustomType Value); }";
+            var compilation = CreateCompilation(new[] { attributeSource, customTypeSource, idSource });
+            var generator = new StronglyTypedIdSupportGenerator();
+            GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
+
+            // Act
+            driver.RunGeneratorsAndUpdateCompilation(compilation, out var updatedCompilation, out var _);
+
+            // Assert ConversionHelper is generated in support file
+            var support = updatedCompilation.SyntaxTrees.First(t => t.FilePath.EndsWith("CustomId.Support.g.cs", StringComparison.Ordinal)).ToString();
+            Assert.Contains("internal static class ConversionHelper", support);
+            Assert.Contains("internal static bool TryConvert<T>(string value, out T result)", support);
+            Assert.Contains("result = (T)Convert.ChangeType(value, typeof(T));", support);
+            Assert.Contains("return true;", support);
+
+            // Assert TryParse uses ConversionHelper for custom type
+            var partial = updatedCompilation.SyntaxTrees.First(t => t.FilePath.EndsWith("CustomId.Partial.g.cs", StringComparison.Ordinal)).ToString();
+            Assert.Contains("ConversionHelper.TryConvert<CustomType>(value, out var parsedValue)", partial);
+        }
+
+        [Fact]
+        public void Should_use_builtin_tryparse_for_supported_types_not_conversion_helper()
+        {
+            // Arrange
+            var attributeSource = @"using System; namespace ErikLieben.FA.StronglyTypedIds { [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)] public class GenerateStronglyTypedIdSupportAttribute : Attribute { public bool GenerateJsonConverter {get;set;}=true; public bool GenerateTypeConverter {get;set;}=true; public bool GenerateParseMethod {get;set;}=true; public bool GenerateTryParseMethod {get;set;}=true; public bool GenerateComparisons {get;set;}=true; public bool GenerateNewMethod {get;set;}=true; public bool GenerateExtensions {get;set;}=true; } }";
+            var idSource = @"namespace Demo { using System; using ErikLieben.FA.StronglyTypedIds; [GenerateStronglyTypedIdSupport] public readonly record struct IntId(int Value); }";
+            var compilation = CreateCompilation(new[] { attributeSource, idSource });
+            var generator = new StronglyTypedIdSupportGenerator();
+            GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
+
+            // Act
+            driver.RunGeneratorsAndUpdateCompilation(compilation, out var updatedCompilation, out var _);
+
+            // Assert ConversionHelper is NOT generated for supported types
+            var support = updatedCompilation.SyntaxTrees.First(t => t.FilePath.EndsWith("IntId.Support.g.cs", StringComparison.Ordinal)).ToString();
+            Assert.DoesNotContain("ConversionHelper", support);
+            Assert.DoesNotContain("TryConvert", support);
+
+            // Assert TryParse uses built-in int.TryParse
+            var partial = updatedCompilation.SyntaxTrees.First(t => t.FilePath.EndsWith("IntId.Partial.g.cs", StringComparison.Ordinal)).ToString();
+            Assert.Contains("int.TryParse(value, out var parsedValue)", partial);
+            Assert.DoesNotContain("ConversionHelper", partial);
+        }
+
+        [Fact]
+        public void Should_extract_record_info_with_various_namespaces()
+        {
+            // Arrange - test records in different namespace structures
+            var attributeSource = @"using System; namespace ErikLieben.FA.StronglyTypedIds { [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)] public class GenerateStronglyTypedIdSupportAttribute : Attribute { public bool GenerateJsonConverter {get;set;}=true; public bool GenerateTypeConverter {get;set;}=true; public bool GenerateParseMethod {get;set;}=true; public bool GenerateTryParseMethod {get;set;}=true; public bool GenerateComparisons {get;set;}=true; public bool GenerateNewMethod {get;set;}=true; public bool GenerateExtensions {get;set;}=true; } }";
+            var idSources = new[] {
+                "namespace MyCompany.Domain { using System; using ErikLieben.FA.StronglyTypedIds; [GenerateStronglyTypedIdSupport] public readonly record struct UserId(Guid Value); }",
+                "namespace Global { using System; using ErikLieben.FA.StronglyTypedIds; [GenerateStronglyTypedIdSupport] public readonly record struct OrderId(int Value); }",
+                "using System; using ErikLieben.FA.StronglyTypedIds; [GenerateStronglyTypedIdSupport] public readonly record struct ProductId(long Value);"
+            };
+            var compilation = CreateCompilation(new[] { attributeSource }.Concat(idSources).ToArray());
+            var generator = new StronglyTypedIdSupportGenerator();
+            GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
+
+            // Act
+            driver.RunGeneratorsAndUpdateCompilation(compilation, out var updatedCompilation, out var _);
+
+            // Assert - files are generated with correct namespaces
+            var userIdPartial = updatedCompilation.SyntaxTrees.FirstOrDefault(t => t.FilePath.EndsWith("UserId.Partial.g.cs", StringComparison.Ordinal));
+            Assert.NotNull(userIdPartial);
+            Assert.Contains("namespace MyCompany.Domain", userIdPartial.ToString());
+
+            var orderIdPartial = updatedCompilation.SyntaxTrees.FirstOrDefault(t => t.FilePath.EndsWith("OrderId.Partial.g.cs", StringComparison.Ordinal));
+            Assert.NotNull(orderIdPartial);
+            Assert.Contains("namespace Global", orderIdPartial.ToString());
+
+            var productIdPartial = updatedCompilation.SyntaxTrees.FirstOrDefault(t => t.FilePath.EndsWith("ProductId.Partial.g.cs", StringComparison.Ordinal));
+            Assert.NotNull(productIdPartial);
+            // No namespace means global namespace - check it doesn't have namespace declaration
+            Assert.DoesNotContain("namespace ", productIdPartial.ToString());
+        }
+
+        [Fact]
+        public void Should_handle_various_system_type_name_conversions()
+        {
+            // Arrange - test all supported system types to ensure GetCSharpTypeName works
+            var attributeSource = @"using System; namespace ErikLieben.FA.StronglyTypedIds { [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)] public class GenerateStronglyTypedIdSupportAttribute : Attribute { public bool GenerateJsonConverter {get;set;}=true; public bool GenerateTypeConverter {get;set;}=true; public bool GenerateParseMethod {get;set;}=true; public bool GenerateTryParseMethod {get;set;}=true; public bool GenerateComparisons {get;set;}=true; public bool GenerateNewMethod {get;set;}=true; public bool GenerateExtensions {get;set;}=true; } }";
+            var idSources = new[] {
+                "namespace Demo { using System; using ErikLieben.FA.StronglyTypedIds; [GenerateStronglyTypedIdSupport] public readonly record struct GuidId(System.Guid Value); }",
+                "namespace Demo { using System; using ErikLieben.FA.StronglyTypedIds; [GenerateStronglyTypedIdSupport] public readonly record struct Int32Id(System.Int32 Value); }",
+                "namespace Demo { using System; using ErikLieben.FA.StronglyTypedIds; [GenerateStronglyTypedIdSupport] public readonly record struct Int64Id(System.Int64 Value); }",
+                "namespace Demo { using System; using ErikLieben.FA.StronglyTypedIds; [GenerateStronglyTypedIdSupport] public readonly record struct DecimalId(System.Decimal Value); }",
+                "namespace Demo { using System; using ErikLieben.FA.StronglyTypedIds; [GenerateStronglyTypedIdSupport] public readonly record struct StringId(System.String Value); }"
+            };
+            var compilation = CreateCompilation(new[] { attributeSource }.Concat(idSources).ToArray());
+            var generator = new StronglyTypedIdSupportGenerator();
+            GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
+
+            // Act
+            driver.RunGeneratorsAndUpdateCompilation(compilation, out var updatedCompilation, out var _);
+
+            // Assert - type names are converted to C# aliases in generated code
+            var guidSupport = updatedCompilation.SyntaxTrees.First(t => t.FilePath.EndsWith("GuidId.Support.g.cs", StringComparison.Ordinal)).ToString();
+            Assert.Contains("reader.GetGuid()", guidSupport);
+            Assert.DoesNotContain("System.Guid", guidSupport);
+
+            var int32Support = updatedCompilation.SyntaxTrees.First(t => t.FilePath.EndsWith("Int32Id.Support.g.cs", StringComparison.Ordinal)).ToString();
+            Assert.Contains("reader.GetInt32()", int32Support);
+            Assert.DoesNotContain("System.Int32", int32Support);
+
+            var decimalSupport = updatedCompilation.SyntaxTrees.First(t => t.FilePath.EndsWith("DecimalId.Support.g.cs", StringComparison.Ordinal)).ToString();
+            Assert.Contains("reader.GetDecimal()", decimalSupport);
+            Assert.Contains("writer.WriteNumberValue(value.Value)", decimalSupport);
+
+            var stringSupport = updatedCompilation.SyntaxTrees.First(t => t.FilePath.EndsWith("StringId.Support.g.cs", StringComparison.Ordinal)).ToString();
+            Assert.Contains("reader.GetString()", stringSupport);
+        }
+
+        [Fact]
+        public void Should_handle_record_with_readonly_modifier()
+        {
+            // Arrange
+            var attributeSource = @"using System; namespace ErikLieben.FA.StronglyTypedIds { [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)] public class GenerateStronglyTypedIdSupportAttribute : Attribute { public bool GenerateJsonConverter {get;set;}=true; public bool GenerateTypeConverter {get;set;}=true; public bool GenerateParseMethod {get;set;}=true; public bool GenerateTryParseMethod {get;set;}=true; public bool GenerateComparisons {get;set;}=true; public bool GenerateNewMethod {get;set;}=true; public bool GenerateExtensions {get;set;}=true; } }";
+            var idSource = @"namespace Demo { using System; using ErikLieben.FA.StronglyTypedIds; [GenerateStronglyTypedIdSupport] public readonly record struct TestId(Guid Value); }";
+            var compilation = CreateCompilation(new[] { attributeSource, idSource });
+            var generator = new StronglyTypedIdSupportGenerator();
+            GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
+
+            // Act
+            driver.RunGeneratorsAndUpdateCompilation(compilation, out var updatedCompilation, out var _);
+
+            // Assert - generation succeeds with readonly record struct
+            var partial = updatedCompilation.SyntaxTrees.FirstOrDefault(t => t.FilePath.EndsWith("TestId.Partial.g.cs", StringComparison.Ordinal));
+            Assert.NotNull(partial);
+            var partialContent = partial.ToString();
+            Assert.Contains("partial record", partialContent);
+            Assert.Contains("TestId", partialContent);
+            Assert.Contains("public static TestId From(string value)", partialContent);
         }
 
         private static Compilation CreateCompilation(string[] sources)
