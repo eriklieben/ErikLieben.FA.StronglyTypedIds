@@ -1,3 +1,16 @@
+## [2.1.0](https://github.com/eriklieben/ErikLieben.FA.StronglyTypedIds/compare/v2.0.7...v2.1.0) (2025-11-20)
+
+### ✨ New features
+
+* enhance generator with expanded type support, culture-aware parsing, and .NET 10 ([#19](https://github.com/eriklieben/ErikLieben.FA.StronglyTypedIds/issues/19)) ([d08fc87](https://github.com/eriklieben/ErikLieben.FA.StronglyTypedIds/commit/d08fc873d83c08b4ad358d29541a494d5bde44ae))
+
+### ⬆️ Dependency updates
+
+* **deps:** Update dependency dotnet-sdk to 9.0.306 (main) ([#13](https://github.com/eriklieben/ErikLieben.FA.StronglyTypedIds/issues/13)) ([bb65f0d](https://github.com/eriklieben/ErikLieben.FA.StronglyTypedIds/commit/bb65f0d3747a70401e9d9453ff41c569a4bdf0d3))
+* **deps:** Update dependency Microsoft.NET.Test.Sdk to v18 (main) ([#12](https://github.com/eriklieben/ErikLieben.FA.StronglyTypedIds/issues/12)) ([45640ef](https://github.com/eriklieben/ErikLieben.FA.StronglyTypedIds/commit/45640ef363963ab4ccf208e502e0ceb23f6fb7ac))
+* **deps:** Update dependency semantic-release to 24.2.9 (main) ([#10](https://github.com/eriklieben/ErikLieben.FA.StronglyTypedIds/issues/10)) ([430cdf8](https://github.com/eriklieben/ErikLieben.FA.StronglyTypedIds/commit/430cdf8c7aadbb0ec24246d82ae5f1baf853c74e))
+* **deps:** Update dependency xunit.runner.visualstudio to 3.1.5 (main) ([#11](https://github.com/eriklieben/ErikLieben.FA.StronglyTypedIds/issues/11)) ([cb22f86](https://github.com/eriklieben/ErikLieben.FA.StronglyTypedIds/commit/cb22f866c822941674a443b41f25fce07a509c83))
+
 ## [2.0.7](https://github.com/eriklieben/ErikLieben.FA.StronglyTypedIds/compare/v2.0.6...v2.0.7) (2025-09-18)
 
 ### ⬆️ Dependency updates
