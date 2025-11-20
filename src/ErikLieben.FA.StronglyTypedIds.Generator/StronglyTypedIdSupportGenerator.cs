@@ -154,6 +154,10 @@ public class StronglyTypedIdSupportGenerator : IIncrementalGenerator
         sb.AppendLine();
 
         // Add usings conditionally
+        if (recordInfo.GenerateComparisons && IsComparable(recordInfo.UnderlyingType))
+        {
+            sb.AppendLine("using System.Collections.Generic;");
+        }
         if (recordInfo.GenerateTypeConverter)
         {
             sb.AppendLine("using System.ComponentModel;");
@@ -162,7 +166,9 @@ public class StronglyTypedIdSupportGenerator : IIncrementalGenerator
         {
             sb.AppendLine("using System.Text.Json.Serialization;");
         }
-        if (recordInfo.GenerateTypeConverter || recordInfo.GenerateJsonConverter)
+        if ((recordInfo.GenerateComparisons && IsComparable(recordInfo.UnderlyingType)) ||
+            recordInfo.GenerateTypeConverter ||
+            recordInfo.GenerateJsonConverter)
         {
             sb.AppendLine();
         }
@@ -309,7 +315,10 @@ public class StronglyTypedIdSupportGenerator : IIncrementalGenerator
         sb.AppendLine();
 
         // Add usings conditionally based on generated features
-        sb.AppendLine("using System;");
+        if (recordInfo.GenerateJsonConverter || recordInfo.GenerateTypeConverter || recordInfo.GenerateExtensions)
+        {
+            sb.AppendLine("using System;");
+        }
 
         if (recordInfo.GenerateExtensions)
         {
@@ -333,7 +342,10 @@ public class StronglyTypedIdSupportGenerator : IIncrementalGenerator
             sb.AppendLine("using System.Text.Json.Serialization;");
         }
 
-        sb.AppendLine();
+        if (recordInfo.GenerateJsonConverter || recordInfo.GenerateTypeConverter || recordInfo.GenerateExtensions)
+        {
+            sb.AppendLine();
+        }
 
         // Add namespace if needed
         if (!string.IsNullOrEmpty(recordInfo.Namespace) && recordInfo.Namespace != "<global namespace>")
@@ -582,51 +594,53 @@ public class StronglyTypedIdSupportGenerator : IIncrementalGenerator
         _ => false
     };
 
-    private const string AttributeSource = @"using System;
+    private const string AttributeSource = """
+        using System;
 
-namespace ErikLieben.FA.StronglyTypedIds;
+        namespace ErikLieben.FA.StronglyTypedIds;
 
-/// <summary>
-/// Generates strongly typed ID support code including converters, extensions, and utility methods
-/// </summary>
-[AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)]
-public class GenerateStronglyTypedIdSupportAttribute : Attribute
-{
-    /// <summary>
-    /// Gets or sets whether to generate a JSON converter
-    /// </summary>
-    public bool GenerateJsonConverter { get; set; } = true;
-    
-    /// <summary>
-    /// Gets or sets whether to generate a type converter
-    /// </summary>
-    public bool GenerateTypeConverter { get; set; } = true;
-    
-    /// <summary>
-    /// Gets or sets whether to generate a Parse method
-    /// </summary>
-    public bool GenerateParseMethod { get; set; } = true;
-    
-    /// <summary>
-    /// Gets or sets whether to generate a TryParse method
-    /// </summary>
-    public bool GenerateTryParseMethod { get; set; } = true;
-    
-    /// <summary>
-    /// Gets or sets whether to generate comparison operators
-    /// </summary>
-    public bool GenerateComparisons { get; set; } = true;
-    
-    /// <summary>
-    /// Gets or sets whether to generate a New method for creating new instances
-    /// </summary>
-    public bool GenerateNewMethod { get; set; } = true;
-    
-    /// <summary>
-    /// Gets or sets whether to generate extension methods
-    /// </summary>
-    public bool GenerateExtensions { get; set; } = true;
-}";
+        /// <summary>
+        /// Generates strongly typed ID support code including converters, extensions, and utility methods
+        /// </summary>
+        [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)]
+        public class GenerateStronglyTypedIdSupportAttribute : Attribute
+        {
+            /// <summary>
+            /// Gets or sets whether to generate a JSON converter
+            /// </summary>
+            public bool GenerateJsonConverter { get; set; } = true;
+
+            /// <summary>
+            /// Gets or sets whether to generate a type converter
+            /// </summary>
+            public bool GenerateTypeConverter { get; set; } = true;
+
+            /// <summary>
+            /// Gets or sets whether to generate a Parse method
+            /// </summary>
+            public bool GenerateParseMethod { get; set; } = true;
+
+            /// <summary>
+            /// Gets or sets whether to generate a TryParse method
+            /// </summary>
+            public bool GenerateTryParseMethod { get; set; } = true;
+
+            /// <summary>
+            /// Gets or sets whether to generate comparison operators
+            /// </summary>
+            public bool GenerateComparisons { get; set; } = true;
+
+            /// <summary>
+            /// Gets or sets whether to generate a New method for creating new instances
+            /// </summary>
+            public bool GenerateNewMethod { get; set; } = true;
+
+            /// <summary>
+            /// Gets or sets whether to generate extension methods
+            /// </summary>
+            public bool GenerateExtensions { get; set; } = true;
+        }
+        """;
 
     private sealed class RecordInfo
     {
