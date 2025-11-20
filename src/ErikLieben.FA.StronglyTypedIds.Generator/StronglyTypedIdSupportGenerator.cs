@@ -154,6 +154,10 @@ public class StronglyTypedIdSupportGenerator : IIncrementalGenerator
         sb.AppendLine();
 
         // Add usings conditionally
+        if ((recordInfo.GenerateParseMethod || recordInfo.GenerateTryParseMethod) && SupportsFormatProvider(recordInfo.UnderlyingType))
+        {
+            sb.AppendLine("using System;");
+        }
         sb.AppendLine("using System.Diagnostics;");
         if (recordInfo.GenerateComparisons && IsComparable(recordInfo.UnderlyingType))
         {
@@ -227,6 +231,23 @@ public class StronglyTypedIdSupportGenerator : IIncrementalGenerator
             sb.AppendLine($"        return new {recordInfo.Name}(parsed);");
             sb.AppendLine("    }");
             sb.AppendLine();
+
+            // Add format provider overload for types that support it
+            if (SupportsFormatProvider(recordInfo.UnderlyingType))
+            {
+                sb.AppendLine("    /// <summary>");
+                sb.AppendLine($"    /// Creates a new {recordInfo.Name} from a string value using the specified format provider");
+                sb.AppendLine("    /// </summary>");
+                sb.AppendLine("    /// <param name=\"value\">The string value to parse</param>");
+                sb.AppendLine("    /// <param name=\"provider\">An object that provides culture-specific formatting information</param>");
+                sb.AppendLine($"    /// <returns>A new {recordInfo.Name} instance</returns>");
+                sb.AppendLine($"    public static {recordInfo.Name} From(string value, IFormatProvider? provider)");
+                sb.AppendLine("    {");
+                sb.AppendLine($"        var parsed = {GetParseExpressionWithProvider(recordInfo.UnderlyingType, "value", "provider")};");
+                sb.AppendLine($"        return new {recordInfo.Name}(parsed);");
+                sb.AppendLine("    }");
+                sb.AppendLine();
+            }
         }
 
         if (recordInfo.GenerateTryParseMethod)
@@ -261,6 +282,31 @@ public class StronglyTypedIdSupportGenerator : IIncrementalGenerator
 
             sb.AppendLine("    }");
             sb.AppendLine();
+
+            // Add format provider overload for types that support it
+            if (SupportsFormatProvider(recordInfo.UnderlyingType))
+            {
+                sb.AppendLine("    /// <summary>");
+                sb.AppendLine($"    /// Tries to parse a string value into a {recordInfo.Name} using the specified format provider");
+                sb.AppendLine("    /// </summary>");
+                sb.AppendLine("    /// <param name=\"value\">The string value to parse</param>");
+                sb.AppendLine("    /// <param name=\"provider\">An object that provides culture-specific formatting information</param>");
+                sb.AppendLine($"    /// <param name=\"result\">The parsed {recordInfo.Name} if successful, null otherwise</param>");
+                sb.AppendLine("    /// <returns>True if parsing was successful, false otherwise</returns>");
+                sb.AppendLine($"    public static bool TryParse(string? value, IFormatProvider? provider, out {recordInfo.Name}? result)");
+                sb.AppendLine("    {");
+                sb.AppendLine("        result = null;");
+                sb.AppendLine("        if (string.IsNullOrEmpty(value)) return false;");
+                sb.AppendLine();
+                sb.AppendLine($"        if ({GetTryParseExpressionWithProvider(recordInfo.UnderlyingType, "value", "provider", "parsedValue")})");
+                sb.AppendLine("        {");
+                sb.AppendLine($"            result = new {recordInfo.Name}(parsedValue);");
+                sb.AppendLine("            return true;");
+                sb.AppendLine("        }");
+                sb.AppendLine("        return false;");
+                sb.AppendLine("    }");
+                sb.AppendLine();
+            }
         }
 
         if (recordInfo.GenerateNewMethod)
@@ -273,11 +319,35 @@ public class StronglyTypedIdSupportGenerator : IIncrementalGenerator
             sb.AppendLine();
         }
 
+        // Add Empty static property for types that have an empty value
+        if (HasEmptyValue(recordInfo.UnderlyingType))
+        {
+            sb.AppendLine("    /// <summary>");
+            sb.AppendLine($"    /// Gets an empty {recordInfo.Name} instance");
+            sb.AppendLine("    /// </summary>");
+            sb.AppendLine($"    public static {recordInfo.Name} Empty {{ get; }} = new({GetEmptyValue(recordInfo.UnderlyingType)});");
+            sb.AppendLine();
+        }
+
         // Override ToString to return just the value
         sb.AppendLine("    /// <summary>");
         sb.AppendLine("    /// Returns the string representation of the underlying value");
         sb.AppendLine("    /// </summary>");
         sb.AppendLine("    public override string ToString() => Value.ToString() ?? string.Empty;");
+        sb.AppendLine();
+
+        // Add implicit conversion from underlying type
+        sb.AppendLine("    /// <summary>");
+        sb.AppendLine($"    /// Implicitly converts from {GetCSharpTypeName(recordInfo.UnderlyingType)} to {recordInfo.Name}");
+        sb.AppendLine("    /// </summary>");
+        sb.AppendLine($"    public static implicit operator {recordInfo.Name}({GetCSharpTypeName(recordInfo.UnderlyingType)} value) => new(value);");
+        sb.AppendLine();
+
+        // Add explicit conversion to underlying type
+        sb.AppendLine("    /// <summary>");
+        sb.AppendLine($"    /// Explicitly converts from {recordInfo.Name} to {GetCSharpTypeName(recordInfo.UnderlyingType)}");
+        sb.AppendLine("    /// </summary>");
+        sb.AppendLine($"    public static explicit operator {GetCSharpTypeName(recordInfo.UnderlyingType)}({recordInfo.Name} value) => value.Value;");
         sb.AppendLine();
 
         // Generate comparison operators if requested
@@ -698,6 +768,41 @@ public class StronglyTypedIdSupportGenerator : IIncrementalGenerator
         "System.DateTime" or "DateTime" => true,
         "System.DateTimeOffset" or "DateTimeOffset" => true,
         _ => false
+    };
+
+    private static bool SupportsFormatProvider(string type) => GetCSharpTypeName(type) switch
+    {
+        "int" or "long" or "decimal" or "short" or "byte" or "double" or "float" => true,
+        "DateTime" or "DateTimeOffset" => true,
+        _ => false
+    };
+
+    private static string GetParseExpressionWithProvider(string type, string value, string provider) => GetCSharpTypeName(type) switch
+    {
+        "int" => $"int.Parse({value}, {provider})",
+        "long" => $"long.Parse({value}, {provider})",
+        "decimal" => $"decimal.Parse({value}, {provider})",
+        "short" => $"short.Parse({value}, {provider})",
+        "byte" => $"byte.Parse({value}, {provider})",
+        "double" => $"double.Parse({value}, {provider})",
+        "float" => $"float.Parse({value}, {provider})",
+        "DateTime" => $"DateTime.Parse({value}, {provider})",
+        "DateTimeOffset" => $"DateTimeOffset.Parse({value}, {provider})",
+        _ => GetParseExpression(type, value)
+    };
+
+    private static string GetTryParseExpressionWithProvider(string type, string value, string provider, string result) => GetCSharpTypeName(type) switch
+    {
+        "int" => $"int.TryParse({value}, {provider}, out var {result})",
+        "long" => $"long.TryParse({value}, {provider}, out var {result})",
+        "decimal" => $"decimal.TryParse({value}, {provider}, out var {result})",
+        "short" => $"short.TryParse({value}, {provider}, out var {result})",
+        "byte" => $"byte.TryParse({value}, {provider}, out var {result})",
+        "double" => $"double.TryParse({value}, {provider}, out var {result})",
+        "float" => $"float.TryParse({value}, {provider}, out var {result})",
+        "DateTime" => $"DateTime.TryParse({value}, {provider}, System.Globalization.DateTimeStyles.None, out var {result})",
+        "DateTimeOffset" => $"DateTimeOffset.TryParse({value}, {provider}, System.Globalization.DateTimeStyles.None, out var {result})",
+        _ => GetTryParseExpression(type, value, result)
     };
 
     private const string AttributeSource = """

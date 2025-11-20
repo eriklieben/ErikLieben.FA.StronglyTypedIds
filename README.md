@@ -72,6 +72,10 @@ Use them like value objects with generated capabilities:
 // Factory methods
 var accountId = AccountId.New();           // Generates new Guid
 var productId = ProductId.New();           // Random int
+var emptyId = AccountId.Empty;             // Static empty value for Guid/DateTime types
+
+// Implicit conversion from underlying type
+AccountId id = Guid.NewGuid();             // Clean and concise!
 
 // Parsing
 var parsed = AccountId.From("550e8400-e29b-41d4-a716-446655440000");
@@ -79,6 +83,9 @@ if (ProductId.TryParse("123", out var tryParsed))
 {
     Console.WriteLine($"Parsed: {tryParsed}");
 }
+
+// Culture-specific parsing for numeric/date types
+var decimalId = DecimalId.From("1.234,56", CultureInfo.GetCultureInfo("de-DE"));
 
 // Type safety - this won't compile!
 // ProcessAccount(productId);  // ❌ Compiler error
@@ -245,6 +252,33 @@ var accountId = AccountId.New();    // New Guid
 var productId = ProductId.New();    // Random int
 var timestamp = TimestampId.New();  // Current UTC time
 var key = ExternalKey.New();        // Guid as string
+
+// Static Empty property for types with natural empty values
+var emptyGuid = UserId.Empty;       // new UserId(Guid.Empty)
+var emptyDate = TimestampId.Empty;  // new TimestampId(DateTime.MinValue)
+
+// Implicit conversion from underlying type
+UserId userId = Guid.NewGuid();     // Implicit conversion
+Guid guid = (Guid)userId;           // Explicit conversion to underlying type
+```
+
+### Culture-Specific Parsing
+
+For numeric and DateTime types, format provider overloads are generated:
+
+```csharp
+// Parse with specific culture
+var germanDecimal = DecimalId.From("1.234,56", CultureInfo.GetCultureInfo("de-DE"));
+var usDecimal = DecimalId.From("1,234.56", CultureInfo.GetCultureInfo("en-US"));
+
+// TryParse with culture
+if (DecimalId.TryParse("1.234,56", CultureInfo.GetCultureInfo("de-DE"), out var result))
+{
+    Console.WriteLine($"Parsed: {result}");
+}
+
+// Works with DateTime too
+var germanDate = DateId.From("31.12.2024", CultureInfo.GetCultureInfo("de-DE"));
 ```
 
 ### Extension Methods
@@ -360,11 +394,14 @@ The Roslyn source generator:
 Generated code includes:
 - JSON converters compatible with System.Text.Json
 - Type converters for model binding and configuration
-- Static factory and parsing methods
+- Static factory and parsing methods (with optional culture-specific overloads)
 - Comparison operators and `IComparable<T>` implementation when applicable
+- Implicit/explicit conversion operators for cleaner syntax
+- Static `Empty` property for types with natural empty values
 - Extension methods for common operations
 - `DebuggerDisplay` attribute for improved debugging
 - Comprehensive XML documentation
+- Optimized using directives (only includes what's needed)
 
 All generation happens at **compile time** - there's no runtime reflection or performance impact.
 
