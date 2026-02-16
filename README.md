@@ -2,9 +2,7 @@
 
 [![NuGet](https://img.shields.io/nuget/v/ErikLieben.FA.StronglyTypedIds?style=flat-square)](https://www.nuget.org/packages/ErikLieben.FA.StronglyTypedIds)
 [![Changelog](https://img.shields.io/badge/Changelog-releases-informational?style=flat-square)](https://github.com/eriklieben/ErikLieben.FA.StronglyTypedIds/releases)
-[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/eriklieben/ErikLieben.FA.StronglyTypedIds/badge)](https://scorecard.dev/viewer/?uri=github.com/eriklieben/ErikLieben.FA.StronglyTypedIds)
 [![.NET 8.0 | 9.0 | 10.0](https://img.shields.io/badge/.NET-8.0%20%7C%209.0%20%7C%2010.0-blue?style=flat-square)](https://dotnet.microsoft.com)
-
 
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=eriklieben_ErikLieben.FA.StronglyTypedIds&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=eriklieben_ErikLieben.FA.StronglyTypedIds)
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=eriklieben_ErikLieben.FA.StronglyTypedIds&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=eriklieben_ErikLieben.FA.StronglyTypedIds)
@@ -13,6 +11,7 @@
 [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=eriklieben_ErikLieben.FA.StronglyTypedIds&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=eriklieben_ErikLieben.FA.StronglyTypedIds)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=eriklieben_ErikLieben.FA.StronglyTypedIds&metric=coverage)](https://sonarcloud.io/summary/new_code?id=eriklieben_ErikLieben.FA.StronglyTypedIds)
 [![Known Vulnerabilities](https://snyk.io/test/github/eriklieben/ErikLieben.FA.StronglyTypedIds/badge.svg)](https://snyk.io/test/github/eriklieben/ErikLieben.FA.StronglyTypedIds)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/eriklieben/ErikLieben.FA.StronglyTypedIds/badge)](https://scorecard.dev/viewer/?uri=github.com/eriklieben/ErikLieben.FA.StronglyTypedIds)
 
 > **Minimal, allocation-friendly strongly typed IDs for .NET, with a Roslyn source generator that adds JSON conversion, parsing, comparison operators, and helpful extensions.**
 
