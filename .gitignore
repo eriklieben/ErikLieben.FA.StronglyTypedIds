@@ -88,3 +88,6 @@ artifacts/
 
 node_modules
 TestResults
+
+release-artifacts/
+coverage/

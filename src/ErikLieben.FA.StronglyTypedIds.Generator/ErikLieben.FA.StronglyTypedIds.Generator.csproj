@@ -1,29 +1,19 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
         <LangVersion>latest</LangVersion>
-        <Nullable>enable</Nullable>
+        <IsPackable>true</IsPackable>
         <IncludeBuildOutput>false</IncludeBuildOutput>
+        <IncludeSymbols>false</IncludeSymbols>
         <DebugType>portable</DebugType>
         <PackageId>ErikLieben.FA.StronglyTypedIds.Generator</PackageId>
-        <PackageVersion Condition="'$(PackageVersion)' == '' and '$(Version)' != ''">$(Version)</PackageVersion>
-        <Authors>Erik Lieben</Authors>
         <Description>Source generator for strongly typed identities</Description>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageLicenseFile>LICENSE</PackageLicenseFile>
-        <RepositoryUrl>https://github.com/eriklieben/ErikLieben.FA.StronglyTypedIds</RepositoryUrl>
         <PackageTags>source-generator;strongly-typed-ids;csharp;dotnet</PackageTags>
         <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
         <PackageType>Analyzer</PackageType>
         <IsRoslynAnalyzer>true</IsRoslynAnalyzer>
-
-        <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
-        <GenerateAssemblyVersionAttribute>true</GenerateAssemblyVersionAttribute>
-        <GenerateAssemblyFileVersionAttribute>true</GenerateAssemblyFileVersionAttribute>
-        <GenerateAssemblyInformationalVersionAttribute>true</GenerateAssemblyInformationalVersionAttribute>
-
-		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-		<IncludeSymbols>false</IncludeSymbols>
+        <NoWarn>NU5128</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>

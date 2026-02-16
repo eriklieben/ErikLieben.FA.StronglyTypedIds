@@ -1,35 +1,16 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
+    <IsPackable>true</IsPackable>
     <DebugType>portable</DebugType>
 
     <!-- NuGet package metadata -->
     <PackageId>ErikLieben.FA.StronglyTypedIds</PackageId>
-    <PackageVersion Condition="'$(PackageVersion)' == '' and '$(Version)' != ''">$(Version)</PackageVersion>
     <Title>ErikLieben.FA.StronglyTypedIds</Title>
-    <Authors>Erik Lieben</Authors>
-    <Company>Erik Lieben</Company>
     <Description>Lightweight strongly typed ID primitives and helpers for .NET.</Description>
     <PackageTags>strongly-typed;ids;value-object;dotnet;csharp</PackageTags>
-    <RepositoryUrl>https://github.com/eriklieben/ErikLieben.FA.StronglyTypedIds</RepositoryUrl>
-
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageLicenseFile>LICENSE</PackageLicenseFile>
-
-    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
-    <GenerateAssemblyVersionAttribute>true</GenerateAssemblyVersionAttribute>
-    <GenerateAssemblyFileVersionAttribute>true</GenerateAssemblyFileVersionAttribute>
-    <GenerateAssemblyInformationalVersionAttribute>true</GenerateAssemblyInformationalVersionAttribute>
-
-    <!-- Symbol package settings -->
-    <IncludeSymbols>true</IncludeSymbols>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <PublishRepositoryUrl>true</PublishRepositoryUrl>
-	  <EmbedUntrackedSources>true</EmbedUntrackedSources>
   </PropertyGroup>
 
   <ItemGroup>

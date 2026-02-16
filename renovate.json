@@ -1,5 +1,6 @@
 {
   "baseBranches": ["main", "maintenance/net8"],
+  "postUpdateOptions": ["nugetRollupLockFiles"],
   "packageRules": [
     {
       "description": "Latest .NET for main branch",

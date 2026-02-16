@@ -1,8 +1,6 @@
-const path = require('path');
-
 module.exports = {
   branches: [
-    "main", 
+    "main",
     "maintenance/net8"
   ],
   plugins: [
@@ -12,12 +10,17 @@ module.exports = {
         preset: 'conventionalcommits',
         releaseRules: [
           {breaking: true, release: 'major'},
-          {type: 'docs', scope:'README', release: 'patch'},
-          {type: 'perf', release: 'patch'},
-          {type: 'fix', release: 'patch'},
-          {type: 'deps', release: 'patch'},
-          {type: "test-deps", release: false },
           {type: 'feat', release: 'minor'},
+          {type: 'fix', release: 'patch'},
+          {type: 'perf', release: 'patch'},
+          {type: 'deps', release: false},
+          {type: 'chore', release: false},
+          {type: 'docs', release: false},
+          {type: 'style', release: false},
+          {type: 'test', release: false},
+          {type: 'refactor', release: false},
+          {type: 'ci', release: false},
+          {type: 'build', release: false}
         ],
         parserOpts: {
           noteKeywords: [
@@ -82,36 +85,15 @@ module.exports = {
       }
     }],
     [
-      '@semantic-release/changelog',
-      {
-        changelogFile: 'docs/CHANGELOG.md'
-      }
-    ],
-    [
       "@semantic-release/exec",
       {
-        "verifyReleaseCmd": "echo '##vso[task.setvariable variable=PackageVersion]${nextRelease.version}'",
-        "prepareCmd": "pwsh -File ./build-packages.ps1 -PackageVersion ${nextRelease.version}"
-      }
-    ],
-    [ 
-      '@semantic-release/npm', {
-        npmPublish: false
-      }
-    ],
-    [
-      '@semantic-release/git',
-      {
-        assets: ['docs/CHANGELOG.md', 'package.json'],
-        message: 'chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}'
+        "prepareCmd": "dotnet pack --configuration Release --output release-artifacts /p:Version=${nextRelease.version}"
       }
     ],
     [
       '@semantic-release/github',
       {
         assets: [
-          'docs/CHANGELOG.md',
-          // Include all .nupkg and .snupkg files from release-artifacts directory
           'release-artifacts/*.nupkg',
           'release-artifacts/*.snupkg'
         ]
