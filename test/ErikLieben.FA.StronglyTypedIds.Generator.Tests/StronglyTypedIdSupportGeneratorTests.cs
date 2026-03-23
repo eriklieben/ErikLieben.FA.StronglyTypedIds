@@ -508,7 +508,7 @@ public class StronglyTypedIdSupportGeneratorTests
         private static Compilation CreateCompilation(string[] sources)
         {
             var parseOptions = new CSharpParseOptions(LanguageVersion.Latest);
-                        var trees = sources.Select(s => CSharpSyntaxTree.ParseText(s, parseOptions));
+            var trees = sources.Select(s => CSharpSyntaxTree.ParseText(s, parseOptions));
 
             // Basic references for the input compilation; we don't need to compile generated code here
             var refs = new[]
