@@ -91,3 +91,9 @@ TestResults
 
 release-artifacts/
 coverage/
+
+# Claude Code — personal/local files
+.claude/settings.local.json
+context/USER.md
+context/MEMORY.md
+context/memory/
