@@ -18,7 +18,7 @@ public class StronglyTypedIdSupportGeneratorTests
             GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
 
             // Act
-            driver.RunGeneratorsAndUpdateCompilation(compilation, out var updatedCompilation, out var _);
+            driver.RunGeneratorsAndUpdateCompilation(compilation, out var updatedCompilation, out var _, TestContext.Current.CancellationToken);
 
             // Assert
             var trees = updatedCompilation.SyntaxTrees.Select(t => t.FilePath).ToArray();
@@ -64,7 +64,7 @@ public class StronglyTypedIdSupportGeneratorTests
             GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
 
             // Act
-            driver.RunGeneratorsAndUpdateCompilation(compilation, out var updatedCompilation, out var _);
+            driver.RunGeneratorsAndUpdateCompilation(compilation, out var updatedCompilation, out var _, TestContext.Current.CancellationToken);
 
             // Assert
             var support = updatedCompilation.SyntaxTrees.First(t => t.FilePath.EndsWith("CustomerId.Support.g.cs", StringComparison.Ordinal)).ToString();
@@ -103,7 +103,7 @@ public class StronglyTypedIdSupportGeneratorTests
             GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
 
             // Act
-            driver.RunGeneratorsAndUpdateCompilation(compilation, out var updatedCompilation, out var _);
+            driver.RunGeneratorsAndUpdateCompilation(compilation, out var updatedCompilation, out var _, TestContext.Current.CancellationToken);
 
             // Assert int
             var intSupport = updatedCompilation.SyntaxTrees.First(t => t.FilePath.EndsWith("IntId.Support.g.cs", StringComparison.Ordinal)).ToString();
@@ -138,7 +138,7 @@ public class StronglyTypedIdSupportGeneratorTests
             GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
 
             // Act
-            driver.RunGeneratorsAndUpdateCompilation(compilation, out var updatedCompilation, out var _);
+            driver.RunGeneratorsAndUpdateCompilation(compilation, out var updatedCompilation, out var _, TestContext.Current.CancellationToken);
 
             // DateTime
             var dtSupport = updatedCompilation.SyntaxTrees.First(t => t.FilePath.EndsWith("CreatedAt.Support.g.cs", StringComparison.Ordinal)).ToString();
@@ -170,7 +170,7 @@ public class StronglyTypedIdSupportGeneratorTests
             GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
 
             // Act
-            driver.RunGeneratorsAndUpdateCompilation(compilation, out var updatedCompilation, out var _);
+            driver.RunGeneratorsAndUpdateCompilation(compilation, out var updatedCompilation, out var _, TestContext.Current.CancellationToken);
 
             // Assert: Partial record should be generated without attributes or methods, support file exists but empty of converters/extensions
             var partial = updatedCompilation.SyntaxTrees.First(t => t.FilePath.EndsWith("DisabledId.Partial.g.cs", StringComparison.Ordinal)).ToString();
@@ -203,7 +203,7 @@ public class StronglyTypedIdSupportGeneratorTests
             GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
 
             // Act
-            driver.RunGeneratorsAndUpdateCompilation(compilation, out var updatedCompilation, out var _);
+            driver.RunGeneratorsAndUpdateCompilation(compilation, out var updatedCompilation, out var _, TestContext.Current.CancellationToken);
 
             // Assert decimal
             var decimalSupport = updatedCompilation.SyntaxTrees.First(t => t.FilePath.EndsWith("DecimalId.Support.g.cs", StringComparison.Ordinal)).ToString();
@@ -253,7 +253,7 @@ public class StronglyTypedIdSupportGeneratorTests
             GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
 
             // Act
-            driver.RunGeneratorsAndUpdateCompilation(compilation, out var updatedCompilation, out var _);
+            driver.RunGeneratorsAndUpdateCompilation(compilation, out var updatedCompilation, out var _, TestContext.Current.CancellationToken);
 
             // Assert Empty property exists for Guid, DateTime, DateTimeOffset
             var guidPartial = updatedCompilation.SyntaxTrees.First(t => t.FilePath.EndsWith("GuidId.Partial.g.cs", StringComparison.Ordinal)).ToString();
@@ -281,7 +281,7 @@ public class StronglyTypedIdSupportGeneratorTests
             GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
 
             // Act
-            driver.RunGeneratorsAndUpdateCompilation(compilation, out var updatedCompilation, out var _);
+            driver.RunGeneratorsAndUpdateCompilation(compilation, out var updatedCompilation, out var _, TestContext.Current.CancellationToken);
 
             // Assert
             var partial = updatedCompilation.SyntaxTrees.First(t => t.FilePath.EndsWith("UserId.Partial.g.cs", StringComparison.Ordinal)).ToString();
@@ -300,7 +300,7 @@ public class StronglyTypedIdSupportGeneratorTests
             GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
 
             // Act
-            driver.RunGeneratorsAndUpdateCompilation(compilation, out var updatedCompilation, out var _);
+            driver.RunGeneratorsAndUpdateCompilation(compilation, out var updatedCompilation, out var _, TestContext.Current.CancellationToken);
 
             // Assert
             var partial = updatedCompilation.SyntaxTrees.First(t => t.FilePath.EndsWith("OrderId.Partial.g.cs", StringComparison.Ordinal)).ToString();
@@ -321,7 +321,7 @@ public class StronglyTypedIdSupportGeneratorTests
             GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
 
             // Act
-            driver.RunGeneratorsAndUpdateCompilation(compilation, out var updatedCompilation, out var _);
+            driver.RunGeneratorsAndUpdateCompilation(compilation, out var updatedCompilation, out var _, TestContext.Current.CancellationToken);
 
             // Assert
             var partial = updatedCompilation.SyntaxTrees.First(t => t.FilePath.EndsWith("ProductId.Partial.g.cs", StringComparison.Ordinal)).ToString();
@@ -344,7 +344,7 @@ public class StronglyTypedIdSupportGeneratorTests
             GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
 
             // Act
-            driver.RunGeneratorsAndUpdateCompilation(compilation, out var updatedCompilation, out var _);
+            driver.RunGeneratorsAndUpdateCompilation(compilation, out var updatedCompilation, out var _, TestContext.Current.CancellationToken);
 
             // Assert format provider overload exists for decimal
             var decimalPartial = updatedCompilation.SyntaxTrees.First(t => t.FilePath.EndsWith("DecimalId.Partial.g.cs", StringComparison.Ordinal)).ToString();
@@ -377,7 +377,7 @@ public class StronglyTypedIdSupportGeneratorTests
             GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
 
             // Act
-            driver.RunGeneratorsAndUpdateCompilation(compilation, out var updatedCompilation, out var _);
+            driver.RunGeneratorsAndUpdateCompilation(compilation, out var updatedCompilation, out var _, TestContext.Current.CancellationToken);
 
             // Assert ConversionHelper is generated in support file
             var support = updatedCompilation.SyntaxTrees.First(t => t.FilePath.EndsWith("CustomId.Support.g.cs", StringComparison.Ordinal)).ToString();
@@ -402,7 +402,7 @@ public class StronglyTypedIdSupportGeneratorTests
             GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
 
             // Act
-            driver.RunGeneratorsAndUpdateCompilation(compilation, out var updatedCompilation, out var _);
+            driver.RunGeneratorsAndUpdateCompilation(compilation, out var updatedCompilation, out var _, TestContext.Current.CancellationToken);
 
             // Assert ConversionHelper is NOT generated for supported types
             var support = updatedCompilation.SyntaxTrees.First(t => t.FilePath.EndsWith("IntId.Support.g.cs", StringComparison.Ordinal)).ToString();
@@ -430,7 +430,7 @@ public class StronglyTypedIdSupportGeneratorTests
             GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
 
             // Act
-            driver.RunGeneratorsAndUpdateCompilation(compilation, out var updatedCompilation, out var _);
+            driver.RunGeneratorsAndUpdateCompilation(compilation, out var updatedCompilation, out var _, TestContext.Current.CancellationToken);
 
             // Assert - files are generated with correct namespaces
             var userIdPartial = updatedCompilation.SyntaxTrees.FirstOrDefault(t => t.FilePath.EndsWith("UserId.Partial.g.cs", StringComparison.Ordinal));
@@ -464,7 +464,7 @@ public class StronglyTypedIdSupportGeneratorTests
             GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
 
             // Act
-            driver.RunGeneratorsAndUpdateCompilation(compilation, out var updatedCompilation, out var _);
+            driver.RunGeneratorsAndUpdateCompilation(compilation, out var updatedCompilation, out var _, TestContext.Current.CancellationToken);
 
             // Assert - type names are converted to C# aliases in generated code
             var guidSupport = updatedCompilation.SyntaxTrees.First(t => t.FilePath.EndsWith("GuidId.Support.g.cs", StringComparison.Ordinal)).ToString();
@@ -494,7 +494,7 @@ public class StronglyTypedIdSupportGeneratorTests
             GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
 
             // Act
-            driver.RunGeneratorsAndUpdateCompilation(compilation, out var updatedCompilation, out var _);
+            driver.RunGeneratorsAndUpdateCompilation(compilation, out var updatedCompilation, out var _, TestContext.Current.CancellationToken);
 
             // Assert - generation succeeds with readonly record struct
             var partial = updatedCompilation.SyntaxTrees.FirstOrDefault(t => t.FilePath.EndsWith("TestId.Partial.g.cs", StringComparison.Ordinal));

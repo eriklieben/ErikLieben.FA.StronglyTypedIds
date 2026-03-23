@@ -1,0 +1,21 @@
+{
+  "docsRepo": "ErikLieben.FA.StronglyTypedIds.docs",
+  "workflowRepo": "agentic-dev-workflow",
+  "project": {
+    "name": "ErikLieben.FA.StronglyTypedIds",
+    "type": "library"
+  },
+  "docs": {
+    "templates": "templates",
+    "output": {
+      "adr": "adr",
+      "rfc": "rfc",
+      "design": "design",
+      "prd": "prd",
+      "runbook": "runbooks",
+      "postmortem": "postmortems",
+      "spike": "spikes",
+      "architecture": "architecture"
+    }
+  }
+}
